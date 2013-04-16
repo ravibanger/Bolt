@@ -1,5 +1,5 @@
 /***************************************************************************                                                                                     
-*   Copyright 2012 Advanced Micro Devices, Inc.                                     
+*   Copyright 2012 - 2013 Advanced Micro Devices, Inc.
 *                                                                                    
 *   Licensed under the Apache License, Version 2.0 (the "License");   
 *   you may not use this file except in compliance with the License.                 
@@ -253,9 +253,8 @@ namespace bolt {
                     tbb::parallel_reduce( tbb::blocked_range<iType*>( &*first, (iType*)&*(last-1) + 1), reduce_op );
                     return reduce_op.value;
 #else
-                    std::cout << "The MultiCoreCpu version of reduce is not enabled. " << std ::endl;
+                    //std::cout << "The MultiCoreCpu version of reduce is not enabled. " << std ::endl;
                     throw ::cl::Error( CL_INVALID_OPERATION, "The MultiCoreCpu version of reduce is not enabled to be built." );
-                    return init;
 #endif
                 } else {
                 device_vector< iType > dvInput( first, last, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, ctl );
@@ -311,9 +310,8 @@ namespace bolt {
                     ctl.getCommandQueue().enqueueUnmapMemObject(first.getBuffer(), reduceInputBuffer);
                     return reduce_op.value;
 #else
-                    std::cout << "The MultiCoreCpu version of reduce is not enabled. " << std ::endl;
+                    //std::cout << "The MultiCoreCpu version of reduce is not enabled. " << std ::endl;
                     throw ::cl::Error( CL_INVALID_OPERATION, "The MultiCoreCpu version of reduce is not enabled to be built." );
-                    return init;
 #endif
                 } else {
                 return reduce_enqueue( ctl, first, last, init, binary_op, cl_code);
@@ -374,17 +372,15 @@ namespace bolt {
                     reduce_kernels,
                     compileOptions);
 
-
-
-
                 // Set up shape of launch grid and buffers:
                 cl_uint computeUnits     = ctl.getDevice().getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
                 int wgPerComputeUnit =  ctl.getWGPerComputeUnit(); 
                 size_t numWG = computeUnits * wgPerComputeUnit;
 
                 cl_int l_Error = CL_SUCCESS;
-                const size_t wgSize  = kernels[0].getWorkGroupInfo< CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >( 
-                    ctl.getDevice( ), &l_Error );
+                //const size_t wgSize  = kernels[0].getWorkGroupInfo< CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >( 
+                //    ctl.getDevice( ), &l_Error );
+                const size_t wgSize  = 64;
                 V_OPENCL( l_Error, "Error querying kernel for CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE" );
 
                 // Create buffer wrappers so we can access the host functors, for read or writing in the kernel

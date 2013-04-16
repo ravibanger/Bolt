@@ -1,5 +1,5 @@
 /***************************************************************************
-*   Copyright 2012 Advanced Micro Devices, Inc.                               
+*   Copyright 2012 - 2013 Advanced Micro Devices, Inc.                               
 *                                                                             
 *   Licensed under the Apache License, Version 2.0 (the "License");   
 *   you may not use this file except in compliance with the License.          
@@ -111,7 +111,7 @@ uint upperBoundBinary( global sType* data, uint left, uint right, sType searchVa
     {
         //  While the values are equal i.e. !(x < y) && !(y < x) increment the index
         sType upperValue = data[ upperBound ];
-        while( !(*lessOp)( upperValue, searchVal ) && !(*lessOp)( searchVal, upperValue) )
+        while( !(*lessOp)( upperValue, searchVal ) && !(*lessOp)( searchVal, upperValue) && (upperBound != right) )
         {
             upperBound++;
             upperValue = data[ upperBound ];

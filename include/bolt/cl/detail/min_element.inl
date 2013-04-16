@@ -1,5 +1,5 @@
 /***************************************************************************                                                                                     
-*   Copyright 2012 Advanced Micro Devices, Inc.                                     
+*   Copyright 2012 - 2013 Advanced Micro Devices, Inc.
 *                                                                                    
 *   Licensed under the Apache License, Version 2.0 (the "License");   
 *   you may not use this file except in compliance with the License.                 
@@ -234,8 +234,9 @@ namespace bolt {
                 size_t numWG = computeUnits * wgPerComputeUnit;
 
                 cl_int l_Error = CL_SUCCESS;
-                const size_t wgSize  = kernels[0].getWorkGroupInfo< CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >( 
-                    ctl.getDevice( ), &l_Error );
+                //const size_t wgSize  = kernels[0].getWorkGroupInfo< CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE >( 
+                //    ctl.getDevice( ), &l_Error );
+                const size_t wgSize  = 64;
                 V_OPENCL( l_Error, "Error querying kernel for CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE" );
 
                 // Create buffer wrappers so we can access the host functors, for read or writing in the kernel
@@ -351,12 +352,12 @@ namespace bolt {
                     runMode = ctl.getDefaultPathToRun();
                 }
                 if (runMode == bolt::cl::control::SerialCpu) {
-                    std::cout << "The SerialCpu version of reduce is not implemented yet." << std ::endl;
+                    //std::cout << "The SerialCpu version of reduce is not implemented yet." << std ::endl;
                     throw ::cl::Error( CL_INVALID_OPERATION, "The SerialCpu version of reduce is not implemented yet." );
                     return last;
                 } else if (runMode == bolt::cl::control::MultiCoreCpu) {
 
-                    std::cout << "The MultiCoreCpu version of reduce is not enabled. " << std ::endl;
+                    //std::cout << "The MultiCoreCpu version of reduce is not enabled. " << std ::endl;
                     throw ::cl::Error( CL_INVALID_OPERATION, "The MultiCoreCpu version of reduce is not enabled to be built." );
                     return last;
 
@@ -389,12 +390,12 @@ namespace bolt {
                     runMode = ctl.getDefaultPathToRun();
                 }
                 if (runMode == bolt::cl::control::SerialCpu) {
-                    std::cout << "The SerialCpu version of min_element is not implemented yet." << std ::endl;
+                    //std::cout << "The SerialCpu version of min_element is not implemented yet." << std ::endl;
                     throw ::cl::Error( CL_INVALID_OPERATION, "The SerialCpu version of min_element is not implemented yet." );
                     return last;
                 } else if (runMode == bolt::cl::control::MultiCoreCpu) {
                     /*TODO - ASK  - should we copy the device_vector to host memory, process the result and then store back the result into the device_vector.*/
-                    std::cout << "The MultiCoreCpu version of min_element on device_vector is not supported." << std ::endl;
+                    //std::cout << "The MultiCoreCpu version of min_element on device_vector is not supported." << std ::endl;
                     throw ::cl::Error( CL_INVALID_OPERATION, "The MultiCoreCpu version of min_element on device_vector is not supported." );
                     return last;
                 } else {

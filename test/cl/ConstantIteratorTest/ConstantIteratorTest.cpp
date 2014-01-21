@@ -21,7 +21,6 @@
 
 #include "bolt/cl/iterator/constant_iterator.h"
 #include "bolt/cl/iterator/counting_iterator.h"
-#include "bolt/cl/iterator/transform_iterator.h"
 #include "bolt/cl/transform.h"
 #include "bolt/cl/reduce.h"
 #include "bolt/cl/functional.h"

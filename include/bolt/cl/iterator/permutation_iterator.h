@@ -108,7 +108,14 @@ public:
 
         return payloadSize;
     }
-
+    int setKernelArguments(int arg_num, ::cl::Kernel &kernel) const
+    {
+        /*First set the element Iterator*/
+        arg_num = m_elt_iter.setKernelArguments(arg_num, kernel);
+        /*Next set the Argument Iterator*/
+        arg_num = this->base().setKernelArguments(arg_num, kernel);
+        return arg_num;
+    }
 private:
     typename super_t::reference dereference() const
         { return *(m_elt_iter + *this->base()); }

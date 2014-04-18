@@ -730,17 +730,20 @@ namespace cl{
         typename OutputIterator::Payload result_payload = result.gpuPayload( );
 
         /*Get the OpenCL buffers. We pass the OpenCL buffer to the kernel*/
-        const ::cl::Buffer &first_buffer = first.base().getContainer().getBuffer();
+        //const ::cl::Buffer &first_buffer = first.base().getContainer().getBuffer();
         const ::cl::Buffer &result_buffer = result.getContainer().getBuffer();
+        int arg_num = 0;
+        arg_num = first.setKernelArguments(arg_num, kernels[boundsCheck]);
 
-        kernels[boundsCheck].setArg(0, first_buffer );
-        kernels[boundsCheck].setArg(1, first_buffer );
-        kernels[boundsCheck].setArg(2, first.gpuPayloadSize( ),&first_payload);
-        kernels[boundsCheck].setArg(3, result_buffer );
-        kernels[boundsCheck].setArg(4, result.gpuPayloadSize( ),&result_payload);
+        //kernels[boundsCheck].setArg(0, first_buffer );
+        //kernels[boundsCheck].setArg(1, first_buffer );
+        kernels[boundsCheck].setArg(arg_num, first.gpuPayloadSize( ),&first_payload);
+
+        kernels[boundsCheck].setArg(arg_num+1, result_buffer );
+        kernels[boundsCheck].setArg(arg_num+2, result.gpuPayloadSize( ),&result_payload);
         //The type cast to int is required because sz is of type size_t
-        kernels[boundsCheck].setArg(5, (int)sz );
-        kernels[boundsCheck].setArg(6, *userFunctor);
+        kernels[boundsCheck].setArg(arg_num+3, (int)sz );
+        kernels[boundsCheck].setArg(arg_num+4, *userFunctor);
 
 
         ::cl::Event transformEvent;

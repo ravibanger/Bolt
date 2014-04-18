@@ -66,43 +66,57 @@ void transformNoBoundsCheckTemplate (
     Z_iter[ gx ] = (*userFunctor)( aa, bb );
 }
 
-template <typename iNakedType, typename iIterType, typename oNakedType, typename oIterType, typename unary_function >
+template <typename iIterType, typename oIterType, typename unary_function >
 kernel
 void unaryTransformTemplate(
-            global iNakedType* A_ptr,
+            global typename iIterType::value_type* in_ptr_0,
+#if defined(SECOND_PTR)
+            global typename iIterType::value_type* in_ptr_1,
+#endif
             iIterType A_iter,
-            global oNakedType* Z_ptr,
+            global typename oIterType::value_type* out_ptr_0,
             oIterType Z_iter,
 			const uint length,
             global unary_function* userFunctor)
 {
+#if defined(SECOND_PTR)
+    A_iter.init( in_ptr_0, in_ptr_1 );
+#else
+    A_iter.init( in_ptr_0 );
+#endif
+    Z_iter.init( out_ptr_0 );
+
     int gx = get_global_id( 0 );
 	if (gx >= length)
 		return;
 
-    A_iter.init( A_ptr );
-    Z_iter.init( Z_ptr );
-
-    iNakedType aa = A_iter[ gx ];
+    typename iIterType::value_type aa = A_iter[ gx ];
     Z_iter[ gx ] = (*userFunctor)( aa );
 }
 
-template <typename iNakedType, typename iIterType, typename oNakedType, typename oIterType, typename unary_function >
+template <typename iIterType, typename oIterType, typename unary_function >
 kernel
 void unaryTransformNoBoundsCheckTemplate(
-            global iNakedType* A_ptr,
+            global typename iIterType::value_type* in_ptr_0,
+#if defined(SECOND_PTR)
+            global typename iIterType::value_type* in_ptr_1,
+#endif
             iIterType A_iter,
-            global oNakedType* Z_ptr,
+            global typename oIterType::value_type* out_ptr_0,
             oIterType Z_iter,
 			const uint length,
             global unary_function* userFunctor)
 {
+#if defined(SECOND_PTR)
+    A_iter.init( in_ptr_0, in_ptr_1 );
+#else
+    A_iter.init( in_ptr_0 );
+#endif
+    Z_iter.init( out_ptr_0 );
+
     int gx = get_global_id( 0 );
 
-    A_iter.init( A_ptr );
-    Z_iter.init( Z_ptr );
-
-    iNakedType aa = A_iter[ gx ];
+    typename iIterType::value_type aa = A_iter[ gx ];
     Z_iter[ gx ] = (*userFunctor)( aa );
 }
 

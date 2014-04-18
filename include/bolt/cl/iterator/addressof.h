@@ -1,9 +1,11 @@
 #ifndef BOLT_ADDRESSOF_H
 #define BOLT_ADDRESSOF_H
 #include <bolt/cl/device_vector.h>
+#include <bolt/cl/iterator/permutation_iterator.h>
 #include <bolt/cl/iterator/transform_iterator.h>
 #include <bolt/cl/iterator/counting_iterator.h>
 #include <bolt/cl/iterator/constant_iterator.h>
+
 namespace bolt{
 namespace cl{
 
@@ -118,6 +120,7 @@ namespace cl{
     {
         return itr;
     }
+
 
 }} //namespace bolt::cl
 

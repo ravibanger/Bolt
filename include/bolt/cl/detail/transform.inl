@@ -32,6 +32,7 @@
 #include "bolt/cl/distance.h"
 #include "bolt/cl/iterator/iterator_traits.h"
 #include "bolt/cl/iterator/transform_iterator.h"
+#include "bolt/cl/iterator/permutation_iterator.h"
 #include "bolt/cl/iterator/addressof.h"
 
 namespace bolt {
@@ -337,41 +338,97 @@ namespace cl{
                 return templateSpecializationString;
             }
     };
-
+    
+    template <typename InputIterator, typename OutputIterator>
     class TransformUnary_KernelTemplateSpecializer : public KernelTemplateSpecializer
     {
+        private:
+        std::string getInputIteratorString(bolt::cl::permutation_iterator_tag, const ::std::vector< ::std::string>& unaryTransformKernels ) const
+        {
+            return "global " + unaryTransformKernels[transform_DVInputIterator]  + "::value_type* in_ptr_0,\n"
+                   "global " + unaryTransformKernels[transform_DVInputIterator]  + "::index_type* in_ptr_1,\n"
+                   + unaryTransformKernels[transform_DVInputIterator] + " input_iter,\n";
+        }
+        std::string getInputIteratorString(bolt::cl::counting_iterator_tag, const ::std::vector< ::std::string>& unaryTransformKernels ) const
+        {
+            return "global " + unaryTransformKernels[transform_DVInputIterator]  + "::value_type* in_ptr_0,\n"
+                   + unaryTransformKernels[transform_DVInputIterator] + " input_iter,\n";
+        }
+        std::string getInputIteratorString(bolt::cl::constant_iterator_tag, const ::std::vector< ::std::string>& unaryTransformKernels ) const       
+        {
+            return "global " + unaryTransformKernels[transform_DVInputIterator]  + "::value_type* in_ptr_0,\n"
+                   + unaryTransformKernels[transform_DVInputIterator] + " input_iter,\n";
+        }
+        std::string getInputIteratorString(bolt::cl::device_vector_tag, const ::std::vector< ::std::string>& unaryTransformKernels ) const
+        {
+            return "global " + unaryTransformKernels[transform_DVInputIterator]  + "::value_type* in_ptr_0,\n"
+                   + unaryTransformKernels[transform_DVInputIterator] + " input_iter,\n";
+        }
+        std::string getInputIteratorString(bolt::cl::transform_iterator_tag, const ::std::vector< ::std::string>& unaryTransformKernels ) const
+        {
+            return "global " + unaryTransformKernels[transform_DVInputIterator]  + "::value_type* in_ptr_0,\n"
+                   + unaryTransformKernels[transform_DVInputIterator] + " input_iter,\n";    
+        }
+
+        std::string getOutputIteratorString(bolt::cl::device_vector_tag, const ::std::vector< ::std::string>& unaryTransformKernels ) const
+        {
+            return "global " + unaryTransformKernels[transform_DVOutputIteratorU]  + "::value_type* out_ptr_0,\n"
+                   + unaryTransformKernels[transform_DVOutputIteratorU] + " output_iter,\n";    
+        }
+
         public:
         TransformUnary_KernelTemplateSpecializer() : KernelTemplateSpecializer()
-            {
+        {
             addKernelName("unaryTransformTemplate");
             addKernelName("unaryTransformNoBoundsCheckTemplate");
         }
-
+        
         const ::std::string operator() ( const ::std::vector< ::std::string>& unaryTransformKernels ) const
             {
+                //const std::string templateSpecializationString =
+                //"// Host generates this instantiation string with user-specified value type and functor\n"
+                //"template __attribute__((mangled_name("+name( 0 )+"Instantiated)))\n"
+                //"kernel void unaryTransformTemplate(\n"
+                //"global " + unaryTransformKernels[transform_iType] + "* A,\n"
+                //+ unaryTransformKernels[transform_DVInputIterator] + " A_iter,\n"
+                //"global " + unaryTransformKernels[transform_oTypeU] + "* Z,\n"
+                //+ unaryTransformKernels[transform_DVOutputIteratorU] + " Z_iter,\n"
+                //"const uint length,\n"
+                //"global " + unaryTransformKernels[transform_UnaryFunction] + "* userFunctor);\n\n"
+
+                //"// Host generates this instantiation string with user-specified value type and functor\n"
+                //"template __attribute__((mangled_name("+name(1)+"Instantiated)))\n"
+                //"kernel void unaryTransformNoBoundsCheckTemplate(\n"
+                //"global " + unaryTransformKernels[transform_iType] + "* A,\n"
+                //+ unaryTransformKernels[transform_DVInputIterator] + " A_iter,\n"
+                //"global " + unaryTransformKernels[transform_oTypeU] + "* Z,\n"
+                //+ unaryTransformKernels[transform_DVOutputIteratorU] + " Z_iter,\n"
+                //"const uint length,\n"
+                //"global " +unaryTransformKernels[transform_UnaryFunction] + "* userFunctor);\n\n";
+                //std::string input_itr_str, output_itr_str;
+                //getInputIteratorString();
+                //getOutputIteratorString();
+
                 const std::string templateSpecializationString =
                 "// Host generates this instantiation string with user-specified value type and functor\n"
                 "template __attribute__((mangled_name("+name( 0 )+"Instantiated)))\n"
                 "kernel void unaryTransformTemplate(\n"
-                "global " + unaryTransformKernels[transform_iType] + "* A,\n"
-                + unaryTransformKernels[transform_DVInputIterator] + " A_iter,\n"
-                "global " + unaryTransformKernels[transform_oTypeU] + "* Z,\n"
-                + unaryTransformKernels[transform_DVOutputIteratorU] + " Z_iter,\n"
-                "const uint length,\n"
+                + getInputIteratorString(std::iterator_traits<InputIterator>::iterator_category(), unaryTransformKernels )
+                + getOutputIteratorString(std::iterator_traits<OutputIterator>::iterator_category(), unaryTransformKernels )
+                + "const uint length,\n"
                 "global " + unaryTransformKernels[transform_UnaryFunction] + "* userFunctor);\n\n"
 
                 "// Host generates this instantiation string with user-specified value type and functor\n"
                 "template __attribute__((mangled_name("+name(1)+"Instantiated)))\n"
                 "kernel void unaryTransformNoBoundsCheckTemplate(\n"
-                "global " + unaryTransformKernels[transform_iType] + "* A,\n"
-                + unaryTransformKernels[transform_DVInputIterator] + " A_iter,\n"
-                "global " + unaryTransformKernels[transform_oTypeU] + "* Z,\n"
-                + unaryTransformKernels[transform_DVOutputIteratorU] + " Z_iter,\n"
-                "const uint length,\n"
+                + getInputIteratorString(std::iterator_traits<InputIterator>::iterator_category(), unaryTransformKernels)
+                + getOutputIteratorString(std::iterator_traits<OutputIterator>::iterator_category(), unaryTransformKernels)
+                + "const uint length,\n"
                 "global " +unaryTransformKernels[transform_UnaryFunction] + "* userFunctor);\n\n";
 
                 return templateSpecializationString;
             }
+
     };
 
     /*! \brief This template function overload is used strictly for device_vector and OpenCL implementations. 
@@ -654,7 +711,7 @@ namespace cl{
         /**********************************************************************************
          * Request Compiled Kernels
          *********************************************************************************/
-        TransformUnary_KernelTemplateSpecializer ts_kts;
+        TransformUnary_KernelTemplateSpecializer<InputIterator, OutputIterator> ts_kts;
         std::vector< ::cl::Kernel > kernels = bolt::cl::getKernels(
             ctl,
             unaryTransformKernels,
@@ -677,12 +734,13 @@ namespace cl{
         const ::cl::Buffer &result_buffer = result.getContainer().getBuffer();
 
         kernels[boundsCheck].setArg(0, first_buffer );
-        kernels[boundsCheck].setArg(1, first.gpuPayloadSize( ),&first_payload);
-        kernels[boundsCheck].setArg(2, result_buffer );
-        kernels[boundsCheck].setArg(3, result.gpuPayloadSize( ),&result_payload);
+        kernels[boundsCheck].setArg(1, first_buffer );
+        kernels[boundsCheck].setArg(2, first.gpuPayloadSize( ),&first_payload);
+        kernels[boundsCheck].setArg(3, result_buffer );
+        kernels[boundsCheck].setArg(4, result.gpuPayloadSize( ),&result_payload);
         //The type cast to int is required because sz is of type size_t
-        kernels[boundsCheck].setArg(4, (int)sz );
-        kernels[boundsCheck].setArg(5, *userFunctor);
+        kernels[boundsCheck].setArg(5, (int)sz );
+        kernels[boundsCheck].setArg(6, *userFunctor);
 
 
         ::cl::Event transformEvent;
@@ -873,7 +931,7 @@ namespace cl{
             #if defined(BOLT_DEBUG_LOG)
             dblog->CodePathTaken(BOLTLOG::BOLT_TRANSFORM,BOLTLOG::BOLT_SERIAL_CPU,"::Transform::SERIAL_CPU");
             #endif
-            serial::unary_transform(ctl, first, last, result, f );
+            //serial::unary_transform(ctl, first, last, result, f );
             return;
         }
         else if( runMode == bolt::cl::control::MultiCoreCpu )
@@ -882,7 +940,7 @@ namespace cl{
             #if defined(BOLT_DEBUG_LOG)
             dblog->CodePathTaken(BOLTLOG::BOLT_TRANSFORM,BOLTLOG::BOLT_MULTICORE_CPU,"::Transform::MULTICORE_CPU");
             #endif
-            btbb::unary_transform(ctl, first, last, result, f);
+            //btbb::unary_transform(ctl, first, last, result, f);
 #else
             throw std::runtime_error( "The MultiCoreCpu version of transform is not enabled to be built! \n" );
 #endif

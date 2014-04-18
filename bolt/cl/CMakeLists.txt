@@ -107,8 +107,12 @@ set( clBolt.Runtime.Headers.Iterator
         ${clBolt.Include.Dir}/iterator/iterator_traits.h
         ${clBolt.Include.Dir}/iterator/constant_iterator.h
         ${clBolt.Include.Dir}/iterator/counting_iterator.h
+<<<<<<< Updated upstream
 	${clBolt.Include.Dir}/iterator/transform_iterator.h
-	${clBolt.Include.Dir}/iterator/permutation_iterator.h
+=======
+        ${clBolt.Include.Dir}/iterator/transform_iterator.h
+        ${clBolt.Include.Dir}/iterator/permutation_iterator.h
+>>>>>>> Stashed changes
     )
 
 set( clBolt.Runtime.Headers.Misc

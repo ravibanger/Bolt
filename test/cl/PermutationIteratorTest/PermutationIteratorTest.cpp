@@ -275,8 +275,8 @@ TEST( PermutationIterator, UnaryTransformRoutine)
             /*Compute expected results*/
             std::transform(sv_perm_begin, sv_perm_end, stlOut.begin(), add3);
             /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
-            //cmpArrays(dvOutVec, stlOut, length);
+            cmpArrays(dvOutVec, stlOut, length);
+            //cmpArrays(svOutVec, stlOut, length);
         }
         //{/*Test case when the both are randomAccessIterator */
         //    bolt::cl::transform(svIndexVec.begin(), svIndexVec.end(), svOutVec.begin(), add3);

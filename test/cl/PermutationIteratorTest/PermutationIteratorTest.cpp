@@ -270,13 +270,13 @@ TEST( PermutationIterator, UnaryTransformRoutine)
         global_id = 0;
 
         {/*Test case when inputs are trf Iterators*/
-            //bolt::cl::transform(sv_perm_begin, sv_perm_end, svOutVec.begin(), add3);
-            bolt::cl::transform(dv_perm_begin, dv_perm_end, dvOutVec.begin(), add3);
+            bolt::cl::transform(sv_perm_begin, sv_perm_end, svOutVec.begin(), add3);
+            //bolt::cl::transform(dv_perm_begin, dv_perm_end, dvOutVec.begin(), add3);
             /*Compute expected results*/
             std::transform(sv_perm_begin, sv_perm_end, stlOut.begin(), add3);
             /*Check the results*/
-            cmpArrays(dvOutVec, stlOut, length);
-            //cmpArrays(svOutVec, stlOut, length);
+            //cmpArrays(dvOutVec, stlOut, length);
+            cmpArrays(svOutVec, stlOut, length);
         }
         //{/*Test case when the both are randomAccessIterator */
         //    bolt::cl::transform(svIndexVec.begin(), svIndexVec.end(), svOutVec.begin(), add3);

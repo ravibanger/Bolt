@@ -284,6 +284,14 @@ namespace cl
                     return m_Container;
                 }
 
+                int setKernelBuffers(int arg_num, ::cl::Kernel &kernel) const 
+                {
+                    const ::cl::Buffer &buffer = getContainer().getBuffer();
+                    kernel.setArg(arg_num, buffer );
+                    arg_num++;
+                    return arg_num;
+                }
+
                 //  This method initializes the payload of the iterator for the cl device; the contents of the pointer is 0 as it has no relevance
                 //  on the host
                 const Payload  gpuPayload( ) const
@@ -291,7 +299,7 @@ namespace cl
                     Payload payload = { m_Index, { 0, 0, 0 } };
                     return payload;
                 }
-
+                
                 //  Calculates the size of payload for the cl device.  The bitness of the device is independant of the host and must be 
                 //  queried.  The bitness of the device determines the size of the pointer contained in the payload.  64bit pointers must
                 //  be 8 byte aligned, so 

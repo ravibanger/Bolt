@@ -21,6 +21,15 @@ namespace cl{
         return itr;
     }
 
+    template <typename ElementIterator, typename IndexIterator>
+    typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::pointer 
+        addressof(typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator> itr)
+    {
+        typedef typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::pointer pointer;
+        pointer ptr = itr;
+        return ptr;
+    }
+
     template <typename UnaryFunction, typename Iterator>
     typename bolt::cl::transform_iterator<UnaryFunction, Iterator>::pointer 
         addressof(typename bolt::cl::transform_iterator<UnaryFunction, Iterator> itr)
@@ -50,6 +59,14 @@ namespace cl{
 
     
     /*******************Create device side Iterators **********************/
+
+    template <typename Iterator, typename DeviceIterator>
+    const transform_iterator<typename Iterator::unary_func, DeviceIterator>
+    create_device_itr(bolt::cl::permutation_iterator_tag, Iterator itr, DeviceIterator dev_itr)
+    {
+        typedef typename Iterator::unary_func unary_func;
+        return transform_iterator<unary_func, DeviceIterator> (dev_itr, itr.functor());
+    } 
 
     template <typename Iterator, typename DeviceIterator>
     const transform_iterator<typename Iterator::unary_func, DeviceIterator>

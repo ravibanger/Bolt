@@ -62,6 +62,7 @@ class permutation_iterator
 public:
     typedef std::ptrdiff_t                                           difference_type;
     typedef typename ElementIterator::value_type                     value_type;
+    typedef typename IndexIterator::value_type *                     pointer;
     typedef typename IndexIterator::value_type                       index_type;
     typedef permutation_iterator_tag                                 iterator_category;
 
@@ -78,6 +79,16 @@ public:
       )
     : super_t(r.base()), m_elt_iter(r.m_elt_iter)
     {}
+
+    operator pointer() {
+        //return &(*bolt::cl::detail::transform_iterator_base<UnaryFunc, Iterator, Reference, Value>::type::base_reference()); 
+        return &(*(this->base_reference())); 
+    } 
+
+    operator const pointer() const { 
+        //return &(*bolt::cl::detail::transform_iterator_base<UnaryFunc, Iterator, Reference, Value>::type::base_reference()); 
+        return &(*(this->base_reference())); 
+    } 
 
     struct Payload
     {
@@ -108,12 +119,12 @@ public:
 
         return payloadSize;
     }
-    int setKernelArguments(int arg_num, ::cl::Kernel &kernel) const
+    int setKernelBuffers(int arg_num, ::cl::Kernel &kernel) const
     {
         /*First set the element Iterator*/
-        arg_num = m_elt_iter.setKernelArguments(arg_num, kernel);
+        arg_num = m_elt_iter.setKernelBuffers(arg_num, kernel);
         /*Next set the Argument Iterator*/
-        arg_num = this->base().setKernelArguments(arg_num, kernel);
+        arg_num = this->base().setKernelBuffers(arg_num, kernel);
         return arg_num;
     }
 private:

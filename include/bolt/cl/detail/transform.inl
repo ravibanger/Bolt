@@ -729,21 +729,23 @@ namespace cl{
         typename InputIterator::Payload  first_payload  = first.gpuPayload( );
         typename OutputIterator::Payload result_payload = result.gpuPayload( );
 
-        /*Get the OpenCL buffers. We pass the OpenCL buffer to the kernel*/
-        //const ::cl::Buffer &first_buffer = first.base().getContainer().getBuffer();
-        const ::cl::Buffer &result_buffer = result.getContainer().getBuffer();
         int arg_num = 0;
-        arg_num = first.setKernelArguments(arg_num, kernels[boundsCheck]);
-
-        //kernels[boundsCheck].setArg(0, first_buffer );
-        //kernels[boundsCheck].setArg(1, first_buffer );
+        /*Set the arguments for the kernel for InputIterator. Note that this takes input as the argument 
+          number to start setting the values. The return value is the number of the argument to begin setting 
+          the next Kernel arguments. 
+          Once the cl::Buffer arguments are set the GPU Payload arguments are also passed to the kernel*/
+        arg_num = first.setKernelBuffers(arg_num, kernels[boundsCheck]);
         kernels[boundsCheck].setArg(arg_num, first.gpuPayloadSize( ),&first_payload);
+        arg_num++;
 
-        kernels[boundsCheck].setArg(arg_num+1, result_buffer );
-        kernels[boundsCheck].setArg(arg_num+2, result.gpuPayloadSize( ),&result_payload);
+        /*Do the same for OutputIterator*/
+        arg_num = result.setKernelBuffers(arg_num, kernels[boundsCheck]);
+        kernels[boundsCheck].setArg(arg_num, result.gpuPayloadSize( ),&result_payload);
+        arg_num++;
+
         //The type cast to int is required because sz is of type size_t
-        kernels[boundsCheck].setArg(arg_num+3, (int)sz );
-        kernels[boundsCheck].setArg(arg_num+4, *userFunctor);
+        kernels[boundsCheck].setArg(arg_num, (int)sz );
+        kernels[boundsCheck].setArg(arg_num+1, *userFunctor);
 
 
         ::cl::Event transformEvent;
@@ -796,7 +798,7 @@ namespace cl{
        
         typedef typename InputIterator::pointer pointer;
         
-        pointer first_pointer = bolt::cl::addressof(first) ;
+        pointer first_pointer = bolt::cl::addressof(first);
 
         device_vector< iType > dvInput( first_pointer, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, true, ctl );
         device_vector< oType > dvOutput( result, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, false, ctl );

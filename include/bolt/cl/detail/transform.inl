@@ -796,20 +796,23 @@ namespace cl{
         typedef typename std::iterator_traits<InputIterator>::value_type  iType;
         typedef typename std::iterator_traits<OutputIterator>::value_type oType;
        
-        typedef typename InputIterator::pointer pointer;
+        //typedef typename InputIterator::pointer pointer;
         
-        pointer first_pointer = bolt::cl::addressof(first);
-
-        device_vector< iType > dvInput( first_pointer, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, true, ctl );
-        device_vector< oType > dvOutput( result, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, false, ctl );
+        typename InputIterator::tuple first_pointer = bolt::cl::addressof(first);
+        int num_of_iterators = std::tuple_size< InputIterator::tuple >::value;
+        std::cout << "num_of_iterators=" << num_of_iterators;
+        
+        
+        //device_vector< iType > dvIterator1 ( first_pointer, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, true, ctl );
+        //device_vector< oType > dvOutput( result, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, false, ctl );
         auto device_iterator_first = bolt::cl::create_device_itr(
                                             typename bolt::cl::iterator_traits< InputIterator >::iterator_category( ), 
                                             first, dvInput.begin() );
-        auto device_iterator_last  = bolt::cl::create_device_itr(
-                                            typename bolt::cl::iterator_traits< InputIterator >::iterator_category( ), 
-                                            last, dvInput.end() );
-        cl::unary_transform(ctl, device_iterator_first, device_iterator_last, dvOutput.begin(), f, user_code);
-        dvOutput.data( );
+        //auto device_iterator_last  = bolt::cl::create_device_itr(
+        //                                    typename bolt::cl::iterator_traits< InputIterator >::iterator_category( ), 
+        //                                    last, dvInput.end() );
+        //cl::unary_transform(ctl, device_iterator_first, device_iterator_last, dvOutput.begin(), f, user_code);
+        //dvOutput.data( );
         return;
     }
 } // namespace cl

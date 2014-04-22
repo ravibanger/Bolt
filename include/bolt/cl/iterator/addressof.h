@@ -22,12 +22,19 @@ namespace cl{
     }
 
     template <typename ElementIterator, typename IndexIterator>
-    typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::pointer 
+    //typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::pointer 
+    std::tuple<typename ElementIterator::value_type*, typename IndexIterator::value_type*>
         addressof(typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator> itr)
     {
-        typedef typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::pointer pointer;
-        pointer ptr = itr;
-        return ptr;
+        /*Note that the pointer in permutation iterator is pointer to the element iterator value_type. 
+          But here we will need a pointer to IndexIterator::value_type. 
+          This is done because the distance between two permutation iterator is equal to the 
+          distance between the corresponding IndexIterator*/
+        typedef typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::index_type *index_type_ptr;
+        typedef typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::value_type *value_type_ptr;
+        index_type_ptr index_ptr = itr;
+        value_type_ptr value_ptr = itr;
+        return std::make_tuple(value_ptr, index_ptr);
     }
 
     template <typename UnaryFunction, typename Iterator>

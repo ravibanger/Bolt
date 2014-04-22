@@ -27,7 +27,7 @@
 
 //#include <iterator>
 #include <type_traits>
-
+#include <tuple>
 #include <bolt/cl/iterator/iterator_adaptor.h>
 #include <bolt/cl/iterator/iterator_facade.h>
 #include <bolt/cl/iterator/iterator_traits.h>
@@ -62,10 +62,10 @@ class permutation_iterator
 public:
     typedef std::ptrdiff_t                                           difference_type;
     typedef typename ElementIterator::value_type                     value_type;
-    typedef typename IndexIterator::value_type *                     pointer;
+    typedef typename ElementIterator::value_type *                   pointer;
     typedef typename IndexIterator::value_type                       index_type;
     typedef permutation_iterator_tag                                 iterator_category;
-
+    typedef std::tuple<value_type *, index_type *>                   tuple;
     permutation_iterator() : m_elt_iter() {}
 
     explicit permutation_iterator(ElementIterator x, IndexIterator y) 
@@ -80,13 +80,13 @@ public:
     : super_t(r.base()), m_elt_iter(r.m_elt_iter)
     {}
 
-    operator pointer() {
-        //return &(*bolt::cl::detail::transform_iterator_base<UnaryFunc, Iterator, Reference, Value>::type::base_reference()); 
+    operator typename IndexIterator::value_type*() {
+        //
         return &(*(this->base_reference())); 
     } 
 
-    operator const pointer() const { 
-        //return &(*bolt::cl::detail::transform_iterator_base<UnaryFunc, Iterator, Reference, Value>::type::base_reference()); 
+    operator const typename IndexIterator::value_type*() const { 
+        //
         return &(*(this->base_reference())); 
     } 
 
@@ -119,6 +119,7 @@ public:
 
         return payloadSize;
     }
+
     int setKernelBuffers(int arg_num, ::cl::Kernel &kernel) const
     {
         /*First set the element Iterator*/
@@ -127,6 +128,12 @@ public:
         arg_num = this->base().setKernelBuffers(arg_num, kernel);
         return arg_num;
     }
+
+    value_type* addressof_element_itr()
+    {
+        return bolt::cl::addressof(m_elt_iter);
+    }
+
 private:
     typename super_t::reference dereference() const
         { return *(m_elt_iter + *this->base()); }

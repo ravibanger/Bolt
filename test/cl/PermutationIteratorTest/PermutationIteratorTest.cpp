@@ -68,6 +68,14 @@ BOLT_FUNCTOR(gen_input,
     };
 );
 
+BOLT_FUNCTOR(gen_input_plus_1,
+    struct gen_input_plus_1
+    {
+        int operator() ()  const { return get_global_id(0) + 1; }
+        typedef int result_type;
+    };
+);
+
 BOLT_FUNCTOR(UDD, 
 struct UDD
 {
@@ -234,6 +242,7 @@ TEST( PermutationIterator, UnaryTransformRoutine)
 
         add_3 add3;
         gen_input gen;
+        gen_input_plus_1 gen_plus_1;
         typedef std::vector< int >::const_iterator                                                     sv_itr;
         typedef bolt::BCKND::device_vector< int >::iterator                                            dv_itr;
         typedef bolt::BCKND::counting_iterator< int >                                                  counting_itr;
@@ -262,20 +271,20 @@ TEST( PermutationIterator, UnaryTransformRoutine)
         global_id = 0;
         std::generate(svIndexVec.begin(),   svIndexVec.end(),   gen); 
         global_id = 0;
-        std::generate(svElementVec.begin(), svElementVec.end(), gen); 
+        std::generate(svElementVec.begin(), svElementVec.end(), gen_plus_1); 
         global_id = 0;
         bolt::BCKND::generate(dvIndexVec.begin(), dvIndexVec.end(), gen);
         global_id = 0;
-        bolt::BCKND::generate(dvElementVec.begin(), dvElementVec.end(), gen);
+        bolt::BCKND::generate(dvElementVec.begin(), dvElementVec.end(), gen_plus_1);
         global_id = 0;
 
-        {/*Test case when inputs are trf Iterators*/
+        {/*Test case when input is a permutation Iterators*/
             bolt::cl::transform(sv_perm_begin, sv_perm_end, svOutVec.begin(), add3);
-            //bolt::cl::transform(dv_perm_begin, dv_perm_end, dvOutVec.begin(), add3);
+            bolt::cl::transform(dv_perm_begin, dv_perm_end, dvOutVec.begin(), add3);
             /*Compute expected results*/
             std::transform(sv_perm_begin, sv_perm_end, stlOut.begin(), add3);
             /*Check the results*/
-            //cmpArrays(dvOutVec, stlOut, length);
+            cmpArrays(dvOutVec, stlOut, length);
             cmpArrays(svOutVec, stlOut, length);
         }
         //{/*Test case when the both are randomAccessIterator */

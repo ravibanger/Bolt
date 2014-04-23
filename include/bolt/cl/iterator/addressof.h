@@ -32,8 +32,8 @@ namespace cl{
           distance between the corresponding IndexIterator*/
         typedef typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::index_type *index_type_ptr;
         typedef typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::value_type *value_type_ptr;
-        index_type_ptr index_ptr = itr;
-        value_type_ptr value_ptr = itr;
+        index_type_ptr index_ptr = itr.getIndex_pointer();
+        value_type_ptr value_ptr = itr.getElement_pointer();
         return std::make_tuple(value_ptr, index_ptr);
     }
 
@@ -64,20 +64,54 @@ namespace cl{
         return ptr;
     }
 
-    
+    /*******************Acquire OpenCL cl_mem Buffers **********************/
+    //template <typename InputIterator>
+    //void acquireBuffers(typename bolt::cl::permutation_iterator_tag, 
+    //                    typename InputIterator::tuple first_pointer, userFunctors)
+    //{
+    //    
+    //}
     /*******************Create device side Iterators **********************/
-
-    template <typename Iterator, typename DeviceIterator>
-    const transform_iterator<typename Iterator::unary_func, DeviceIterator>
-    create_device_itr(bolt::cl::permutation_iterator_tag, Iterator itr, DeviceIterator dev_itr)
+    template <typename ElementIterator, typename IndexIterator>
+    //const bolt::cl::permutation_iterator<ElementIterator, IndexIterator>
+    void create_device_buffers(bolt::cl::permutation_iterator_tag, 
+                          bolt::cl::permutation_iterator<ElementIterator, IndexIterator> &begin, 
+                          bolt::cl::permutation_iterator<ElementIterator, IndexIterator> &end, bolt::cl::control &ctl)
     {
-        typedef typename Iterator::unary_func unary_func;
-        return transform_iterator<unary_func, DeviceIterator> (dev_itr, itr.functor());
+
+        typedef typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::index_type *index_type_ptr;
+        typedef typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::value_type *value_type_ptr;
+        index_type_ptr index_ptr_begin = begin.getIndex_pointer();
+        value_type_ptr value_ptr_begin = begin.getElement_pointer();
+        index_type_ptr index_ptr_end   = end.getIndex_pointer();
+        value_type_ptr value_ptr_end   = end.getElement_pointer();
+        size_t index_size = index_ptr_end - index_ptr_begin;
+        size_t values_size = value_ptr_end - value_ptr_begin;
+        control::buffPointer value_buffer = ctl.acquireBuffer(values_size * sizeof( typename ElementIterator::value_type ),
+                                                          CL_MEM_USE_HOST_PTR|CL_MEM_READ_ONLY, index_ptr_begin);
+        control::buffPointer index_buffer = ctl.acquireBuffer(index_size * sizeof( typename IndexIterator::value_type),
+                                                          CL_MEM_USE_HOST_PTR|CL_MEM_READ_ONLY, index_ptr_begin);
+        bolt::cl::device_vector<typename ElementIterator::value_type> dv_values_vector(*value_buffer);
+        bolt::cl::device_vector<typename IndexIterator::value_type> dv_index_vector(*index_buffer);
+
+        begin = bolt::cl::make_permutation_iterator(dv_values_vector.begin(), dv_index_vector.begin() );
+        end   = bolt::cl::make_permutation_iterator(dv_values_vector.end(), dv_index_vector.end() );
+        return;
+    }
+    /*******************Create device side Iterators **********************/
+    template <typename ElementIterator, typename IndexIterator>
+    const bolt::cl::permutation_iterator<ElementIterator, IndexIterator>
+    create_device_itr(bolt::cl::permutation_iterator_tag, 
+                      bolt::cl::permutation_iterator<ElementIterator, IndexIterator> itr, 
+                      ElementIterator element_itr,
+                      IndexIterator   index_itr)
+    {
+        return permutation_iterator<ElementIterator, IndexIterator> (element_itr, index_itr);
     } 
 
     template <typename Iterator, typename DeviceIterator>
     const transform_iterator<typename Iterator::unary_func, DeviceIterator>
-    create_device_itr(bolt::cl::transform_iterator_tag, Iterator itr, DeviceIterator dev_itr)
+    create_device_itr(bolt::cl::transform_iterator_tag, Iterator itr, DeviceIterator dev_itr_1, DeviceIterator dev_itr_2=NULL)
     {
         typedef typename Iterator::unary_func unary_func;
         return transform_iterator<unary_func, DeviceIterator> (dev_itr, itr.functor());
@@ -85,28 +119,28 @@ namespace cl{
 
     template <typename Iterator, typename DeviceIterator>
     const typename bolt::cl::device_vector<typename Iterator::value_type>::iterator 
-    create_device_itr(std::random_access_iterator_tag, Iterator itr, DeviceIterator dev_itr)
+    create_device_itr(std::random_access_iterator_tag, Iterator itr, DeviceIterator dev_itr_1, DeviceIterator dev_itr_2=NULL)
     {
-        return dev_itr;
+        return dev_itr_1;
     }
 
     template <typename T, typename DeviceIterator>
     const typename bolt::cl::device_vector<T>::iterator 
-    create_device_itr(std::random_access_iterator_tag, T* ptr, DeviceIterator dev_itr)
+    create_device_itr(std::random_access_iterator_tag, T* ptr, DeviceIterator dev_itr_1, DeviceIterator dev_itr_2=NULL)
     {
-        return dev_itr;
+        return dev_itr_1;
     }
 
     template <typename Iterator, typename DeviceIterator>
     const constant_iterator<typename Iterator::value_type> 
-    create_device_itr(bolt::cl::constant_iterator_tag, Iterator itr, DeviceIterator dev_itr)
+    create_device_itr(bolt::cl::constant_iterator_tag, Iterator itr, DeviceIterator dev_itr_1, DeviceIterator dev_itr_2=NULL)
     {
         return itr;
     }
 
     template <typename Iterator, typename DeviceIterator>
     const counting_iterator<typename Iterator::value_type> 
-    create_device_itr(bolt::cl::counting_iterator_tag, Iterator itr, DeviceIterator dev_itr)
+    create_device_itr(bolt::cl::counting_iterator_tag, Iterator itr, DeviceIterator dev_itr_1, DeviceIterator dev_itr_2=NULL)
     {
         return itr;
     }

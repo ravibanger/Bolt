@@ -80,15 +80,15 @@ public:
     : super_t(r.base()), m_elt_iter(r.m_elt_iter)
     {}
 
-    operator typename IndexIterator::value_type*() {
-        //
+    typename IndexIterator::value_type* getIndex_pointer ()
+    {
         return &(*(this->base_reference())); 
-    } 
+    }
 
-    operator const typename IndexIterator::value_type*() const { 
-        //
-        return &(*(this->base_reference())); 
-    } 
+    typename IndexIterator::value_type* getElement_pointer ()
+    {
+        return &(*(this->m_elt_iter)); 
+    }
 
     struct Payload
     {
@@ -129,18 +129,24 @@ public:
         return arg_num;
     }
 
-    value_type* addressof_element_itr()
+    void set_index_cl_mem(::cl::Buffer &index_cl_mem)
     {
-        return bolt::cl::addressof(m_elt_iter);
+        m_index_cl_mem = index_cl_mem;
     }
 
+    void set_element_cl_mem(::cl::Buffer &element_cl_mem)
+    {
+        m_elt_cl_mem = element_cl_mem;
+    }
 private:
     typename super_t::reference dereference() const
         { return *(m_elt_iter + *this->base()); }
-
+    //::cl::Buffer    &m_elt_cl_mem;
+    //::cl::Buffer    &m_index_cl_mem;
 
 public:
     ElementIterator m_elt_iter;
+
 };
 
 

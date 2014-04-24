@@ -73,8 +73,9 @@ namespace cl{
     //}
     /*******************Create device side Iterators **********************/
     template <typename ElementIterator, typename IndexIterator>
-    //const bolt::cl::permutation_iterator<ElementIterator, IndexIterator>
-    void create_device_buffers(bolt::cl::permutation_iterator_tag, 
+    bolt::cl::permutation_iterator<typename bolt::cl::device_vector<typename ElementIterator::value_type>::iterator, 
+                                   typename bolt::cl::device_vector<typename IndexIterator::value_type>::iterator>
+    create_device_buffers(bolt::cl::permutation_iterator_tag, 
                           bolt::cl::permutation_iterator<ElementIterator, IndexIterator> &begin, 
                           bolt::cl::permutation_iterator<ElementIterator, IndexIterator> &end, bolt::cl::control &ctl)
     {
@@ -83,10 +84,10 @@ namespace cl{
         typedef typename bolt::cl::permutation_iterator<ElementIterator, IndexIterator>::value_type *value_type_ptr;
         index_type_ptr index_ptr_begin = begin.getIndex_pointer();
         value_type_ptr value_ptr_begin = begin.getElement_pointer();
-        index_type_ptr index_ptr_end   = end.getIndex_pointer();
-        value_type_ptr value_ptr_end   = end.getElement_pointer();
-        size_t index_size = index_ptr_end - index_ptr_begin;
-        size_t values_size = value_ptr_end - value_ptr_begin;
+        //index_type_ptr index_ptr_end   = end.getIndex_pointer();
+        //value_type_ptr value_ptr_end   = end.getElement_pointer();
+        size_t values_size = end.m_elt_iter - begin.m_elt_iter;
+        size_t index_size = end - begin;
         control::buffPointer value_buffer = ctl.acquireBuffer(values_size * sizeof( typename ElementIterator::value_type ),
                                                           CL_MEM_USE_HOST_PTR|CL_MEM_READ_ONLY, index_ptr_begin);
         control::buffPointer index_buffer = ctl.acquireBuffer(index_size * sizeof( typename IndexIterator::value_type),
@@ -94,9 +95,7 @@ namespace cl{
         bolt::cl::device_vector<typename ElementIterator::value_type> dv_values_vector(*value_buffer);
         bolt::cl::device_vector<typename IndexIterator::value_type> dv_index_vector(*index_buffer);
 
-        begin = bolt::cl::make_permutation_iterator(dv_values_vector.begin(), dv_index_vector.begin() );
-        end   = bolt::cl::make_permutation_iterator(dv_values_vector.end(), dv_index_vector.end() );
-        return;
+        return bolt::cl::make_permutation_iterator(dv_values_vector.begin(), dv_index_vector.begin() );
     }
     /*******************Create device side Iterators **********************/
     template <typename ElementIterator, typename IndexIterator>

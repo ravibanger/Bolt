@@ -799,7 +799,7 @@ namespace cl{
         //typedef typename InputIterator::pointer pointer;
         
         
-        bolt::cl::create_device_buffers(typename bolt::cl::iterator_traits< InputIterator >::iterator_category( ),
+        auto device_iterator_first = bolt::cl::create_device_buffers(typename bolt::cl::iterator_traits< InputIterator >::iterator_category( ),
                                          first, last, ctl);
         device_vector< oType >  dvOutput( result, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, false, ctl );
 
@@ -833,7 +833,7 @@ namespace cl{
                                             last, dvInputIndexIterator.end(), dvInputElementIterator.end() );*/
 
 
-        cl::unary_transform(ctl, first, last, dvOutput.begin(), f, user_code);
+        cl::unary_transform(ctl, device_iterator_first, device_iterator_first+sz, dvOutput.begin(), f, user_code);
         dvOutput.data( );
         return;
     }

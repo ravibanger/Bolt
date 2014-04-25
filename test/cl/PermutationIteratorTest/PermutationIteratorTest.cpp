@@ -279,23 +279,23 @@ TEST( PermutationIterator, UnaryTransformRoutine)
         global_id = 0;
 
         {/*Test case when input is a permutation Iterators*/
-            bolt::cl::transform(sv_perm_begin, sv_perm_end, svOutVec.begin(), add3);
+            //bolt::cl::transform(sv_perm_begin, sv_perm_end, svOutVec.begin(), add3);
             bolt::cl::transform(dv_perm_begin, dv_perm_end, dvOutVec.begin(), add3);
             /*Compute expected results*/
             std::transform(sv_perm_begin, sv_perm_end, stlOut.begin(), add3);
             /*Check the results*/
             cmpArrays(dvOutVec, stlOut, length);
-            cmpArrays(svOutVec, stlOut, length);
+            //cmpArrays(svOutVec, stlOut, length);
         }
-        //{/*Test case when the both are randomAccessIterator */
-        //    bolt::cl::transform(svIndexVec.begin(), svIndexVec.end(), svOutVec.begin(), add3);
-        //    bolt::cl::transform(dvIndexVec.begin(), dvIndexVec.end(), dvOutVec.begin(), add3);
+        {/*Test case when the both are randomAccessIterator */
+            bolt::cl::transform(svIndexVec.begin(), svIndexVec.end(), svOutVec.begin(), add3);
+            //bolt::cl::transform(dvIndexVec.begin(), dvIndexVec.end(), dvOutVec.begin(), add3);
         //    /*Compute expected results*/
-        //    std::transform(svIndexVec.begin(), svIndexVec.end(), stlOut.begin(), add3);
+            //std::transform(svIndexVec.begin(), svIndexVec.end(), stlOut.begin(), add3);
         //    /*Check the results*/
-        //    cmpArrays(svOutVec, stlOut, length);
-        //    cmpArrays(dvOutVec, stlOut, length);
-        //}
+            //cmpArrays(svOutVec, stlOut, length);
+            //cmpArrays(dvOutVec, stlOut, length);
+        }
         //{/*Test case when the first input is constant iterator and the second is a counting iterator */
         //    bolt::cl::transform(const_itr_begin, const_itr_end, svOutVec.begin(), add3);
         //    bolt::cl::transform(const_itr_begin, const_itr_end, dvOutVec.begin(), add3);

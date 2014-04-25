@@ -69,7 +69,7 @@ public:
     permutation_iterator() : m_elt_iter() {}
 
     explicit permutation_iterator(ElementIterator x, IndexIterator y) 
-      : super_t(y), m_elt_iter(x), elementBuffer(x.getContainer().getBuffer(), indexBuffer(y.getContainer().getBuffer() ){}
+      : super_t(y), m_elt_iter(x) {}
 
     template<class OtherElementIterator, class OtherIndexIterator>
     permutation_iterator(
@@ -141,13 +141,10 @@ public:
 private:
     typename super_t::reference dereference() const
         { return *(m_elt_iter + *this->base()); }
-    //::cl::Buffer    &m_elt_cl_mem;
-    //::cl::Buffer    &m_index_cl_mem;
+
 
 public:
     ElementIterator m_elt_iter;
-    ::cl::Buffer &elementBuffer;
-    ::cl::Buffer &indexBuffer;
 };
 
 

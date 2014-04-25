@@ -786,7 +786,7 @@ namespace cl{
                                        std::random_access_iterator_tag
                                      >::value
                            >::type
-    unary_transform( ::bolt::cl::control &ctl, InputIterator first, InputIterator last,
+    unary_transform( ::bolt::cl::control &ctl, const InputIterator& first, const InputIterator& last,
     const OutputIterator& result, const UnaryFunction& f, const std::string& user_code )
     {
         //size_t sz = bolt::cl::distance(first, last);
@@ -796,47 +796,19 @@ namespace cl{
         typedef typename std::iterator_traits<InputIterator>::value_type  iType;
         typedef typename std::iterator_traits<OutputIterator>::value_type oType;
         
-        //typedef typename InputIterator::pointer pointer;
+        typedef typename InputIterator::pointer pointer;
         
-        ::cl::Buffer *value_buffer;
-        ::cl::Buffer *index_buffer;
-        auto device_iterator_first = bolt::cl::create_device_buffers(typename bolt::cl::iterator_traits< InputIterator >::iterator_category( ),
-                                         first, last, &value_buffer, &index_buffer, ctl);
-        
-        int refCount = 0;
-   
-        device_vector< oType >  dvOutput( result, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, false, ctl );
+        pointer first_pointer = bolt::cl::addressof(first) ;
 
-        ////typename InputIterator::tuple first_pointer = bolt::cl::addressof(first);
-        //int num_of_iterators = std::tuple_size< typename InputIterator::tuple >::value;
-        //
-        ////std::vector< control::buffPointer > userFunctors(num_of_iterators);
-        ////bolt::cl::acquireBuffers(typename bolt::cl::iterator_traits< InputIterator >::iterator_category( ), 
-        ////                         first_pointer, userFunctors);
-
-        //
-        ////control::buffPointer userFunctor = ctl.acquireBuffer( sizeof( aligned_comp ),
-        ////                                                  CL_MEM_USE_HOST_PTR|CL_MEM_READ_ONLY, &aligned_comp );
-        //
-        ////bolt::cl::create_device_iterator(first);
-        //
-        ////int num_of_iterators = std::tuple_size< InputIterator::tuple >::value;
-        //
-        ////control::buffPointer userFunctor[num_of_iterators];
-       
-        //device_vector< typename InputIterator::value_type > dvInputIndexIterator ( std::get<0>(first_pointer), sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, true, ctl );
-        //device_vector< typename InputIterator::value_type > dvInputElementIterator ( std::get<1>(first_pointer), sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, true, ctl );
-        //device_vector< oType >  dvOutput( result, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, false, ctl );
-
-/*        auto device_iterator_first = bolt::cl::create_device_itr(
+        device_vector< iType > dvInput( first_pointer, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, true, ctl );
+        device_vector< oType > dvOutput( result, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, false, ctl );
+        auto device_iterator_first = bolt::cl::create_device_itr(
                                             typename bolt::cl::iterator_traits< InputIterator >::iterator_category( ), 
-                                            first, dvInputIndexIterator.begin(), dvInputElementIterator.begin() );
-
+                                            first, dvInput.begin() );
         auto device_iterator_last  = bolt::cl::create_device_itr(
                                             typename bolt::cl::iterator_traits< InputIterator >::iterator_category( ), 
-                                            last, dvInputIndexIterator.end(), dvInputElementIterator.end() );*/
-
-        cl::unary_transform(ctl, device_iterator_first, device_iterator_first+sz, dvOutput.begin(), f, user_code);
+                                            last, dvInput.end() );
+        cl::unary_transform(ctl, device_iterator_first, device_iterator_last, dvOutput.begin(), f, user_code);
         dvOutput.data( );
         return;
     }

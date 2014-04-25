@@ -370,7 +370,7 @@ namespace cl
                 }
 
                 Container& m_Container;
-                ::cl::Buffer& m_Container;
+                
             };
 
             /*! \brief A reverse random access iterator in the classic sense

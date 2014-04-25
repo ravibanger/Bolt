@@ -798,9 +798,13 @@ namespace cl{
         
         //typedef typename InputIterator::pointer pointer;
         
-        
+        ::cl::Buffer *value_buffer;
+        ::cl::Buffer *index_buffer;
         auto device_iterator_first = bolt::cl::create_device_buffers(typename bolt::cl::iterator_traits< InputIterator >::iterator_category( ),
-                                         first, last, ctl);
+                                         first, last, &value_buffer, &index_buffer, ctl);
+        
+        int refCount = 0;
+   
         device_vector< oType >  dvOutput( result, sz, CL_MEM_USE_HOST_PTR | CL_MEM_READ_WRITE, false, ctl );
 
         ////typename InputIterator::tuple first_pointer = bolt::cl::addressof(first);
@@ -831,7 +835,6 @@ namespace cl{
         auto device_iterator_last  = bolt::cl::create_device_itr(
                                             typename bolt::cl::iterator_traits< InputIterator >::iterator_category( ), 
                                             last, dvInputIndexIterator.end(), dvInputElementIterator.end() );*/
-
 
         cl::unary_transform(ctl, device_iterator_first, device_iterator_first+sz, dvOutput.begin(), f, user_code);
         dvOutput.data( );

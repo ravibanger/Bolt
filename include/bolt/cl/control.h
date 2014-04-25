@@ -272,6 +272,7 @@ namespace bolt {
             buffPointer acquireBuffer( size_t reqSize, cl_mem_flags flags = CL_MEM_READ_WRITE, const void* host_ptr = NULL );
             /*! Freeing memory*/
             void freeBuffers( );
+            //void releaseBuffer( buffPointer cl_buffer) { *cl_buffer.retain(); return;}
 
         private:
 

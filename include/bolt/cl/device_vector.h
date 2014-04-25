@@ -306,10 +306,10 @@ namespace cl
                 const difference_type gpuPayloadSize( ) const
                 {
                     cl_int l_Error = CL_SUCCESS;
-		    ::cl::Device which_device;
-		   l_Error  = m_Container.m_commQueue.getInfo(CL_QUEUE_DEVICE,&which_device );	
+		            ::cl::Device which_device;
+		            l_Error  = m_Container.m_commQueue.getInfo(CL_QUEUE_DEVICE,&which_device );	
                    
-		  cl_uint deviceBits = which_device.getInfo< CL_DEVICE_ADDRESS_BITS >( );
+		            cl_uint deviceBits = which_device.getInfo< CL_DEVICE_ADDRESS_BITS >( );
 
                     //  Size of index and pointer
                     difference_type payloadSize = sizeof( difference_type ) + ( deviceBits >> 3 );
@@ -370,6 +370,7 @@ namespace cl
                 }
 
                 Container& m_Container;
+                ::cl::Buffer& m_Container;
             };
 
             /*! \brief A reverse random access iterator in the classic sense

@@ -69,7 +69,7 @@ public:
     permutation_iterator() : m_elt_iter() {}
 
     explicit permutation_iterator(ElementIterator x, IndexIterator y) 
-      : super_t(y), m_elt_iter(x) {}
+      : super_t(y), m_elt_iter(x), elementBuffer(x.getContainer().getBuffer(), indexBuffer(y.getContainer().getBuffer() ){}
 
     template<class OtherElementIterator, class OtherIndexIterator>
     permutation_iterator(
@@ -146,7 +146,8 @@ private:
 
 public:
     ElementIterator m_elt_iter;
-
+    ::cl::Buffer &elementBuffer;
+    ::cl::Buffer &indexBuffer;
 };
 
 

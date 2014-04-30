@@ -176,6 +176,12 @@ namespace cl
             return payloadSize;
         }
 
+        int setKernelBuffers(int arg_num, ::cl::Kernel &kernel) const
+        {
+            /*Next set the Argument Iterator*/
+            arg_num = this->base().setKernelBuffers(arg_num, kernel);
+            return arg_num;
+        }
   private:
     typename super_t::reference dereference() const
     { return m_f(*this->base()); }

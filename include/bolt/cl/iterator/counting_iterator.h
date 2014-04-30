@@ -169,6 +169,13 @@ namespace cl {
                 return sizeof( Payload );
             }
 
+            int setKernelBuffers(int arg_num, ::cl::Kernel &kernel) const
+            {
+                    const ::cl::Buffer &buffer = getContainer().getBuffer();
+                    kernel.setArg(arg_num, buffer );
+                    arg_num++;
+                    return arg_num;
+            }
 
             difference_type distance_to( const counting_iterator< value_type >& rhs ) const
             {

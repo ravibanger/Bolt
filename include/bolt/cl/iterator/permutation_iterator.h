@@ -28,13 +28,14 @@
 //#include <iterator>
 #include <type_traits>
 #include <tuple>
+#include <bolt/cl/bolt.h>
+#include <bolt/cl/device_vector.h>
 #include <bolt/cl/iterator/iterator_adaptor.h>
 #include <bolt/cl/iterator/iterator_facade.h>
 #include <bolt/cl/iterator/iterator_traits.h>
-#include <bolt/cl/device_vector.h>
 #include <bolt/cl/iterator/constant_iterator.h>
 #include <bolt/cl/iterator/counting_iterator.h>
-#include <bolt/cl/device_vector.h>
+
 
 namespace bolt {
 namespace cl {
@@ -61,9 +62,9 @@ class permutation_iterator
 
 public:
     typedef std::ptrdiff_t                                           difference_type;
-    typedef typename ElementIterator::value_type                     value_type;
-    typedef typename ElementIterator::value_type *                   pointer;
-    typedef typename IndexIterator::value_type                       index_type;
+    typedef typename bolt::cl::iterator_traits<ElementIterator>::value_type     value_type;
+    typedef typename bolt::cl::iterator_traits<ElementIterator>::value_type *   pointer;
+    typedef typename bolt::cl::iterator_traits<ElementIterator>::value_type     index_type;
     typedef permutation_iterator_tag                                 iterator_category;
     typedef std::tuple<value_type *, index_type *>                   tuple;
     permutation_iterator() : m_elt_iter() {}
@@ -80,12 +81,12 @@ public:
     : super_t(r.base()), m_elt_iter(r.m_elt_iter)
     {}
 
-    typename IndexIterator::value_type* getIndex_pointer ()
+    typename index_type* getIndex_pointer ()
     {
         return &(*(this->base_reference())); 
     }
 
-    typename IndexIterator::value_type* getElement_pointer ()
+    typename value_type* getElement_pointer ()
     {
         return &(*(this->m_elt_iter)); 
     }
@@ -158,6 +159,7 @@ make_permutation_iterator( ElementIterator e, IndexIterator i )
 
    //  This string represents the device side definition of the Transform Iterator template
     static std::string devicePermutationIteratorTemplate = 
+
         bolt::cl::deviceVectorIteratorTemplate +
         bolt::cl::deviceConstantIterator +
         bolt::cl::deviceCountingIterator +

@@ -300,6 +300,80 @@ namespace cl{
     enum TransformUnaryTypes {transform_iType, transform_DVInputIterator, transform_oTypeU,
                                 transform_DVOutputIteratorU, transform_UnaryFunction, transform_endU };
 
+    ////template <typename IteratorTag>
+    ////class KernelParameterStrings
+    ////{
+    ////        std::string getInputIteratorString(typename IteratorTag, const ::std::string& itrStr )
+    ////        {
+    ////            return "global " + itrStr  + "::value_type* in_ptr_0,\n"
+    ////                   + itrStr + " input_iter,\n";
+    ////        }        
+
+    ////        virtual std::string getOutputIteratorString(bolt::cl::device_vector_tag, const ::std::string& unaryTransformItrStr ) 
+    ////        {
+    ////            return "global " + unaryTransformItrStr  + "::value_type* out_ptr_0,\n"
+    ////                   + unaryTransformItrStr + " output_iter,\n";    
+    ////        }
+    ////};
+
+
+    ////template <>
+    ////class KernelParameterStrings<bolt::cl::permutation_iterator_tag>
+    ////{
+    ////        std::string getInputIteratorString(bolt::cl::permutation_iterator_tag, const ::std::string& itrStr )
+    ////        {
+    ////            return "global " + itrStr  + "::value_type* in_ptr_0,\n"
+    ////                   "global " + itrStr  + "::index_type* in_ptr_1,\n"
+    ////                   + itrStr + " input_iter,\n";
+    ////        }      
+    ////        
+    ////        std::string getOutputIteratorString(bolt::cl::device_vector_tag, const ::std::string& unaryTransformItrStr ) 
+    ////        {
+    ////            return "global " + unaryTransformItrStr  + "::value_type* out_ptr_0,\n"
+    ////                   + unaryTransformItrStr + " output_iter,\n";    
+    ////        }  
+    ////};
+
+
+    class KernelParameterStrings
+    {
+
+        public:
+            std::string getInputIteratorString(bolt::cl::permutation_iterator_tag, const ::std::string& unaryTransformItrStr ) 
+            {
+                return "global " + unaryTransformItrStr  + "::value_type* in_ptr_0,\n"
+                       "global " + unaryTransformItrStr  + "::index_type* in_ptr_1,\n"
+                       + unaryTransformItrStr + " input_iter,\n";
+            }
+            std::string getInputIteratorString(bolt::cl::counting_iterator_tag, const ::std::string& unaryTransformItrStr ) 
+            {
+                return "global " + unaryTransformItrStr  + "::value_type* in_ptr_0,\n"
+                       + unaryTransformItrStr + " input_iter,\n";
+            }
+            std::string getInputIteratorString(bolt::cl::constant_iterator_tag, const ::std::string& unaryTransformItrStr )        
+            {
+                return "global " + unaryTransformItrStr  + "::value_type* in_ptr_0,\n"
+                       + unaryTransformItrStr + " input_iter,\n";
+            }
+            std::string getInputIteratorString(bolt::cl::device_vector_tag, const ::std::string& unaryTransformItrStr ) 
+            {
+                return "global " + unaryTransformItrStr  + "::value_type* in_ptr_0,\n"
+                       + unaryTransformItrStr + " input_iter,\n";
+            }
+            std::string getInputIteratorString(bolt::cl::transform_iterator_tag, const ::std::string& unaryTransformItrStr ) 
+            {
+                return "global " + unaryTransformItrStr  + "::value_type* in_ptr_0,\n"
+                       + unaryTransformItrStr + " input_iter,\n";    
+            }
+
+            std::string getOutputIteratorString(bolt::cl::device_vector_tag, const ::std::string& unaryTransformItrStr ) 
+            {
+                return "global " + unaryTransformItrStr  + "::value_type* out_ptr_0,\n"
+                       + unaryTransformItrStr + " output_iter,\n";    
+            }
+    };
+
+
     class Transform_KernelTemplateSpecializer : public KernelTemplateSpecializer
     {
         public:
@@ -341,41 +415,9 @@ namespace cl{
     };
     
     template <typename InputIterator, typename OutputIterator>
-    class TransformUnary_KernelTemplateSpecializer : public KernelTemplateSpecializer
+    class TransformUnary_KernelTemplateSpecializer : public KernelTemplateSpecializer, public  KernelParameterStrings
     {
-        protected:
-            std::string getInputIteratorString(bolt::cl::permutation_iterator_tag, const ::std::string& unaryTransformItrStr ) const
-            {
-                return "global " + unaryTransformItrStr  + "::value_type* in_ptr_0,\n"
-                       "global " + unaryTransformItrStr  + "::index_type* in_ptr_1,\n"
-                       + unaryTransformItrStr + " input_iter,\n";
-            }
-            std::string getInputIteratorString(bolt::cl::counting_iterator_tag, const ::std::string& unaryTransformItrStr ) const
-            {
-                return "global " + unaryTransformItrStr  + "::value_type* in_ptr_0,\n"
-                       + unaryTransformItrStr + " input_iter,\n";
-            }
-            std::string getInputIteratorString(bolt::cl::constant_iterator_tag, const ::std::string& unaryTransformItrStr ) const       
-            {
-                return "global " + unaryTransformItrStr  + "::value_type* in_ptr_0,\n"
-                       + unaryTransformItrStr + " input_iter,\n";
-            }
-            std::string getInputIteratorString(bolt::cl::device_vector_tag, const ::std::string& unaryTransformItrStr ) const
-            {
-                return "global " + unaryTransformItrStr  + "::value_type* in_ptr_0,\n"
-                       + unaryTransformItrStr + " input_iter,\n";
-            }
-            std::string getInputIteratorString(bolt::cl::transform_iterator_tag, const ::std::string& unaryTransformItrStr ) const
-            {
-                return "global " + unaryTransformItrStr  + "::value_type* in_ptr_0,\n"
-                       + unaryTransformItrStr + " input_iter,\n";    
-            }
 
-            std::string getOutputIteratorString(bolt::cl::device_vector_tag, const ::std::string& unaryTransformItrStr ) const
-            {
-                return "global " + unaryTransformItrStr  + "::value_type* out_ptr_0,\n"
-                       + unaryTransformItrStr + " output_iter,\n";    
-            }
         public:
         TransformUnary_KernelTemplateSpecializer() : KernelTemplateSpecializer()
         {
@@ -390,9 +432,9 @@ namespace cl{
                 "// Host generates this instantiation string with user-specified value type and functor\n"
                 "template __attribute__((mangled_name("+name( 0 )+"Instantiated)))\n"
                 "kernel void unaryTransformTemplate(\n"
-                + getInputIteratorString(std::iterator_traits<InputIterator>::iterator_category(), 
+                + this->KernelParameterStrings::getInputIteratorString(std::iterator_traits<InputIterator>::iterator_category(), 
                                          unaryTransformKernels[transform_DVInputIterator] )
-                + getOutputIteratorString(std::iterator_traits<OutputIterator>::iterator_category(), 
+                + this->KernelParameterStrings::getOutputIteratorString(std::iterator_traits<OutputIterator>::iterator_category(), 
                                           unaryTransformKernels[transform_DVOutputIteratorU] )
                 + "const uint length,\n"
                 "global " + unaryTransformKernels[transform_UnaryFunction] + "* userFunctor);\n\n"
@@ -400,9 +442,9 @@ namespace cl{
                 "// Host generates this instantiation string with user-specified value type and functor\n"
                 "template __attribute__((mangled_name("+name(1)+"Instantiated)))\n"
                 "kernel void unaryTransformNoBoundsCheckTemplate(\n"
-                + getInputIteratorString(std::iterator_traits<InputIterator>::iterator_category(), 
+                + this->KernelParameterStrings::getInputIteratorString(std::iterator_traits<InputIterator>::iterator_category(), 
                                          unaryTransformKernels[transform_DVInputIterator])
-                + getOutputIteratorString(std::iterator_traits<OutputIterator>::iterator_category(), 
+                + this->KernelParameterStrings::getOutputIteratorString(std::iterator_traits<OutputIterator>::iterator_category(), 
                                           unaryTransformKernels[transform_DVOutputIteratorU])
                 + "const uint length,\n"
                 "global " +unaryTransformKernels[transform_UnaryFunction] + "* userFunctor);\n\n";

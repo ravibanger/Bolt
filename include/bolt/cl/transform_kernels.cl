@@ -66,58 +66,84 @@ void transformNoBoundsCheckTemplate (
     Z_iter[ gx ] = (*userFunctor)( aa, bb );
 }
 
-template <typename iIterType, typename oIterType, typename unary_function >
+template <typename iNakedType, typename iIterType, typename oNakedType, typename oIterType, typename unary_function >
 kernel
 void unaryTransformTemplate(
-            global typename iIterType::value_type* in_ptr_0,
-#if defined(SECOND_PTR)
-            global typename iIterType::value_type* in_ptr_1,
-#endif
+            global iNakedType* A_ptr,
             iIterType A_iter,
-            global typename oIterType::value_type* out_ptr_0,
+            global oNakedType* Z_ptr,
             oIterType Z_iter,
 			const uint length,
             global unary_function* userFunctor)
 {
-#if defined(SECOND_PTR)
-    A_iter.init( in_ptr_0, in_ptr_1 );
-#else
-    A_iter.init( in_ptr_0 );
-#endif
-    Z_iter.init( out_ptr_0 );
-
     int gx = get_global_id( 0 );
 	if (gx >= length)
 		return;
 
-    typename iIterType::value_type aa = A_iter[ gx ];
+    A_iter.init( A_ptr );
+    Z_iter.init( Z_ptr );
+
+    iNakedType aa = A_iter[ gx ];
     Z_iter[ gx ] = (*userFunctor)( aa );
 }
 
-template <typename iIterType, typename oIterType, typename unary_function >
+template <typename iNakedType, typename iIterType, typename oNakedType, typename oIterType, typename unary_function >
 kernel
 void unaryTransformNoBoundsCheckTemplate(
-            global typename iIterType::value_type* in_ptr_0,
-#if defined(SECOND_PTR)
-            global typename iIterType::value_type* in_ptr_1,
-#endif
+            global iNakedType* A_ptr,
             iIterType A_iter,
-            global typename oIterType::value_type* out_ptr_0,
+            global oNakedType* Z_ptr,
             oIterType Z_iter,
 			const uint length,
             global unary_function* userFunctor)
 {
-#if defined(SECOND_PTR)
-    A_iter.init( in_ptr_0, in_ptr_1 );
-#else
-    A_iter.init( in_ptr_0 );
-#endif
-    Z_iter.init( out_ptr_0 );
-
     int gx = get_global_id( 0 );
 
-    typename iIterType::value_type aa = A_iter[ gx ];
+    A_iter.init( A_ptr );
+    Z_iter.init( Z_ptr );
+
+    iNakedType aa = A_iter[ gx ];
     Z_iter[ gx ] = (*userFunctor)( aa );
 }
 
+#define BURST_SIZE 16
 
+template <typename iType, typename oType, typename unary_function>
+kernel
+void unaryTransformA (
+    global iType* input,
+    global oType* output,
+    const uint numElements,
+    const uint numElementsPerThread,
+    global unary_function *userFunctor )
+{
+	// global pointers
+    // __global const iType  *inputBase =  &input[get_global_id(0)*numElementsPerThread];
+    // __global oType *const outputBase = &output[get_global_id(0)*numElementsPerThread];
+
+    __private iType  inReg[BURST_SIZE];
+    //__private oType outReg[BURST_SIZE];
+    //__private unary_function f = *userFunctor;
+
+    // for each burst
+    for (int offset = 0; offset < numElementsPerThread; offset+=BURST_SIZE)
+    {
+        // load burst
+        for( int i = 0; i < BURST_SIZE; i++)
+        {
+            inReg[i]=input[get_global_id(0)*numElementsPerThread+offset+i];
+        }
+        // compute burst
+        //for( int j = 0; j < BURST_SIZE; j++)
+        //{
+        //    inReg[j]=(*userFunctor)(inReg[j]);
+        //}
+        // write burst
+        for( int k = 0; k < BURST_SIZE; k++)
+        {
+            output[get_global_id(0)*numElementsPerThread+offset+k]=inReg[k];
+        }
+
+    }
+    // output[get_global_id(0)] = inReg[BURST_SIZE-1];
+}

@@ -480,14 +480,14 @@ namespace bolt {
 
         completeKernelString = PreprocessorDefinitions;
 
-        // (2) type definitions
+        // (1) type definitions
         completeKernelString += "\n// Type Definitions\n";
         for (size_t i = 0; i < typeDefs.size(); i++)
         {
             completeKernelString += "\n" + typeDefs[i] + "\n";
         }
 
-        // (1) raw kernel
+        // (2) raw kernel
         completeKernelString += "\n// Raw Kernel\n\n" + kernelString;
 
         //for ( std::set<std::string>::iterator iter = typeDefs.begin(); iter != typeDefs.end(); iter++ )

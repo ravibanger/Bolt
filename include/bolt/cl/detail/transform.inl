@@ -300,39 +300,6 @@ namespace cl{
     enum TransformUnaryTypes {transform_iType, transform_DVInputIterator, transform_oTypeU,
                                 transform_DVOutputIteratorU, transform_UnaryFunction, transform_endU };
 
-    ////template <typename IteratorTag>
-    ////class KernelParameterStrings
-    ////{
-    ////        std::string getInputIteratorString(typename IteratorTag, const ::std::string& itrStr )
-    ////        {
-    ////            return "global " + itrStr  + "::value_type* in_ptr_0,\n"
-    ////                   + itrStr + " input_iter,\n";
-    ////        }        
-
-    ////        virtual std::string getOutputIteratorString(bolt::cl::device_vector_tag, const ::std::string& unaryTransformItrStr ) 
-    ////        {
-    ////            return "global " + unaryTransformItrStr  + "::value_type* out_ptr_0,\n"
-    ////                   + unaryTransformItrStr + " output_iter,\n";    
-    ////        }
-    ////};
-
-
-    ////template <>
-    ////class KernelParameterStrings<bolt::cl::permutation_iterator_tag>
-    ////{
-    ////        std::string getInputIteratorString(bolt::cl::permutation_iterator_tag, const ::std::string& itrStr )
-    ////        {
-    ////            return "global " + itrStr  + "::value_type* in_ptr_0,\n"
-    ////                   "global " + itrStr  + "::index_type* in_ptr_1,\n"
-    ////                   + itrStr + " input_iter,\n";
-    ////        }      
-    ////        
-    ////        std::string getOutputIteratorString(bolt::cl::device_vector_tag, const ::std::string& unaryTransformItrStr ) 
-    ////        {
-    ////            return "global " + unaryTransformItrStr  + "::value_type* out_ptr_0,\n"
-    ////                   + unaryTransformItrStr + " output_iter,\n";    
-    ////        }  
-    ////};
 
 
     class KernelParameterStrings

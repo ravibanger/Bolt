@@ -119,12 +119,14 @@ namespace cl {
                 m_Index = rhs.m_Index;
                 return *this;
             }
-
-            operator pointer() {
+            
+            value_type* getPointer()
+            {
                 return &m_constValue;
             }
 
-            operator const pointer() const {
+            const value_type* getPointer() const
+            {
                 return &m_constValue;
             }
 
@@ -229,6 +231,7 @@ namespace cl {
     static std::string deviceConstantIterator =
         std::string("#if !defined(BOLT_CL_CONSTANT_ITERATOR) \n") +
         STRINGIFY_CODE(
+        #define BOLT_CL_CONSTANT_ITERATOR \n
         namespace bolt { namespace cl { \n
         template< typename T > \n
         class constant_iterator \n

@@ -310,6 +310,7 @@ TEST( PermutationIterator, BinaryTransformRoutine)
 
         add_3 add3;
         gen_input gen;
+        bolt::cl::plus<int> plus;
         gen_input_plus_1 gen_plus_1;
         typedef std::vector< int >::const_iterator                                                     sv_itr;
         typedef bolt::BCKND::device_vector< int >::iterator                                            dv_itr;
@@ -358,38 +359,67 @@ TEST( PermutationIterator, BinaryTransformRoutine)
         global_id = 0;
 
         {/*Test case when input is a permutation Iterators*/
-            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, dv_perm_begin2, dvOutVec.begin(), add3);
+            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, dv_perm_begin2, dvOutVec.begin(), plus);
             /*Compute expected results*/
-            std::transform(sv_perm_begin1, sv_perm_end1, sv_perm_begin2, stlOut.begin(), add3);
+            std::transform(sv_perm_begin1, sv_perm_end1, sv_perm_begin2, stlOut.begin(), plus);
             /*Check the results*/
             cmpArrays(dvOutVec, stlOut, length);
         }
         {/*Test case when input is a permutation Iterators*/
-            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, const_itr_begin, dvOutVec.begin(), add3);
+            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, dv_trf_begin1, dvOutVec.begin(), plus);
             /*Compute expected results*/
-            std::transform(sv_perm_begin1, sv_perm_end1, const_itr_begin, stlOut.begin(), add3);
+            std::transform(sv_perm_begin1, sv_perm_end1, sv_trf_begin1, stlOut.begin(), plus);
             /*Check the results*/
             cmpArrays(dvOutVec, stlOut, length);
         }
         {/*Test case when input is a permutation Iterators*/
-            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, count_itr_begin, dvOutVec.begin(), add3);
+            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, const_itr_begin, dvOutVec.begin(), plus);
             /*Compute expected results*/
-            std::transform(sv_perm_begin1, sv_perm_end1, count_itr_begin, stlOut.begin(), add3);
+            std::transform(sv_perm_begin1, sv_perm_end1, const_itr_begin, stlOut.begin(), plus);
             /*Check the results*/
             cmpArrays(dvOutVec, stlOut, length);
         }
         {/*Test case when input is a permutation Iterators*/
-            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, dvElementVec2.begin(), dvOutVec.begin(), add3);
+            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, count_itr_begin, dvOutVec.begin(), plus);
             /*Compute expected results*/
-            std::transform(sv_perm_begin1, sv_perm_end1, svElementVec2.begin(), stlOut.begin(), add3);
+            std::transform(sv_perm_begin1, sv_perm_end1, count_itr_begin, stlOut.begin(), plus);
+            /*Check the results*/
+            cmpArrays(dvOutVec, stlOut, length);
+        }
+        {/*Test case when input is a permutation Iterators*/
+            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, dvElementVec2.begin(), dvOutVec.begin(), plus);
+            /*Compute expected results*/
+            std::transform(sv_perm_begin1, sv_perm_end1, svElementVec2.begin(), stlOut.begin(), plus);
             /*Check the results*/
             cmpArrays(dvOutVec, stlOut, length);
         }
 
         {/*Test case when input is a permutation Iterators*/
-            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, dvElementVec2.begin(), dvOutVec.begin(), add3);
+            bolt::cl::transform(dvElementVec2.begin(), dvElementVec2.end(), dv_perm_begin1, dvOutVec.begin(), plus);
             /*Compute expected results*/
-            std::transform(sv_perm_begin1, sv_perm_end1, svElementVec2.begin(), stlOut.begin(), add3);
+            std::transform(svElementVec2.begin(), svElementVec2.end(), sv_perm_begin1, stlOut.begin(), plus);
+            /*Check the results*/
+            cmpArrays(dvOutVec, stlOut, length);
+        }
+
+        {/*Test case when input is a permutation Iterators*/
+            bolt::cl::transform(const_itr_begin, const_itr_end, dv_perm_begin1, dvOutVec.begin(), plus);
+            /*Compute expected results*/
+            std::transform(const_itr_begin, const_itr_end, sv_perm_begin1, stlOut.begin(), plus);
+            /*Check the results*/
+            cmpArrays(dvOutVec, stlOut, length);
+        }
+        {/*Test case when input is a permutation Iterators*/
+            bolt::cl::transform(dv_trf_begin1, dv_trf_end1, dv_perm_begin1, dvOutVec.begin(), plus);
+            /*Compute expected results*/
+            std::transform(sv_trf_begin1, sv_trf_end1, sv_perm_begin1, stlOut.begin(), plus);
+            /*Check the results*/
+            cmpArrays(dvOutVec, stlOut, length);
+        }
+        {/*Test case when input is a permutation Iterators*/
+            bolt::cl::transform(count_itr_begin, count_itr_end, dv_perm_begin1, dvOutVec.begin(), plus);
+            /*Compute expected results*/
+            std::transform(count_itr_begin, count_itr_end, sv_perm_begin1, stlOut.begin(), plus);
             /*Check the results*/
             cmpArrays(dvOutVec, stlOut, length);
         }

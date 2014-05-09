@@ -338,38 +338,38 @@ namespace cl{
     class KernelParameterStrings
     {
     private:
-        std::string toString(int num)
+        std::string toString(int num) const
         {
             std::ostringstream oss;
             oss << num;
             return oss.str();
         }
         public:
-            std::string getInputIteratorString(bolt::cl::permutation_iterator_tag, const ::std::string& itrStr ) const 
+            std::string getInputIteratorString(bolt::cl::permutation_iterator_tag, const ::std::string& itrStr, int itr_num ) const 
             {
-                return "global " + itrStr  + "::value_type* in_ptr_0,\n"
-                       "global " + itrStr  + "::index_type* in_ptr_1,\n"
-                       + itrStr + " input_iter,\n";
+                return "global " + itrStr  + "::value_type* in" + toString(itr_num) + "_ptr_0,\n"
+                       "global " + itrStr  + "::index_type* in" + toString(itr_num) + "_ptr_1,\n"
+                       + itrStr + " input" + toString(itr_num) + "_iter,\n";
             }
-            std::string getInputIteratorString(bolt::cl::counting_iterator_tag, const ::std::string& itrStr ) const 
+            std::string getInputIteratorString(bolt::cl::counting_iterator_tag, const ::std::string& itrStr, int itr_num ) const 
             {
-                return "global " + itrStr  + "::value_type* in_ptr_0,\n"
-                       + itrStr + " input_iter,\n";
+                return "global " + itrStr  + "::value_type* in" + toString(itr_num) + "_ptr_0,\n"
+                       + itrStr + " input" + toString(itr_num) + "_iter,\n";
             }
-            std::string getInputIteratorString(bolt::cl::constant_iterator_tag, const ::std::string& itrStr )       const  
+            std::string getInputIteratorString(bolt::cl::constant_iterator_tag, const ::std::string& itrStr, int itr_num )       const  
             {
-                return "global " + itrStr  + "::value_type* in_ptr_0,\n"
-                       + itrStr + " input_iter,\n";
+                return "global " + itrStr  + "::value_type* in" + toString(itr_num) + "_ptr_0,\n"
+                       + itrStr + " input" + toString(itr_num) + "_iter,\n";
             }
-            std::string getInputIteratorString(bolt::cl::device_vector_tag, const ::std::string& itrStr ) const 
+            std::string getInputIteratorString(bolt::cl::device_vector_tag, const ::std::string& itrStr, int itr_num ) const 
             {
-                return "global " + itrStr  + "::value_type* in_ptr_0,\n"
-                       + itrStr + " input_iter,\n";
+                return "global " + itrStr  + "::value_type* in" + toString(itr_num) + "_ptr_0,\n"
+                       + itrStr + " input" + toString(itr_num) + "_iter,\n";
             }
-            std::string getInputIteratorString(bolt::cl::transform_iterator_tag, const ::std::string& itrStr ) const 
+            std::string getInputIteratorString(bolt::cl::transform_iterator_tag, const ::std::string& itrStr, int itr_num ) const 
             {
-                return "global " + itrStr  + "::value_type* in_ptr_0,\n"
-                       + itrStr + " input_iter,\n";    
+                return "global " + itrStr  + "::value_type* in" + toString(itr_num) + "_ptr_0,\n"
+                       + itrStr + " input" + toString(itr_num) + "_iter,\n";    
             }
 
             std::string getOutputIteratorString(bolt::cl::device_vector_tag, const ::std::string& itrStr ) const 
@@ -379,9 +379,11 @@ namespace cl{
             }
     };
 
+
     template <typename InputIterator1, typename InputIterator2, typename OutputIterator>
     class Transform_KernelTemplateSpecializer : public KernelTemplateSpecializer
     {
+        KernelParameterStrings kps;
         public:
         Transform_KernelTemplateSpecializer() : KernelTemplateSpecializer()
         {
@@ -396,11 +398,11 @@ namespace cl{
                 "template __attribute__((mangled_name("+name( 0 )+"Instantiated)))\n"
                 "kernel void "+name(0)+"(\n"
                 + kps.getInputIteratorString(std::iterator_traits<InputIterator1>::iterator_category(), 
-                                         unaryTransformKernels[transform_DVInputIterator] )
+                                         binaryTransformKernels[transform_DVInputIterator1], 1 )
                 + kps.getInputIteratorString(std::iterator_traits<InputIterator2>::iterator_category(), 
-                                         unaryTransformKernels[transform_DVInputIterator] )
+                                         binaryTransformKernels[transform_DVInputIterator2], 2 )
                 + kps.getOutputIteratorString(std::iterator_traits<OutputIterator>::iterator_category(), 
-                                          unaryTransformKernels[transform_DVOutputIteratorU] )
+                                          binaryTransformKernels[transform_DVOutputIteratorB] )
                 + "const uint length,\n"
                 "global " + binaryTransformKernels[transform_BinaryFunction] + "* userFunctor);\n\n"
 
@@ -408,41 +410,16 @@ namespace cl{
                 "template __attribute__((mangled_name("+name(1)+"Instantiated)))\n"
                 "kernel void "+name(1)+"(\n"
                 + kps.getInputIteratorString(std::iterator_traits<InputIterator1>::iterator_category(), 
-                                         unaryTransformKernels[transform_DVInputIterator])
+                                         binaryTransformKernels[transform_DVInputIterator1], 1)
                 + kps.getInputIteratorString(std::iterator_traits<InputIterator2>::iterator_category(), 
-                                         unaryTransformKernels[transform_DVInputIterator])
+                                         binaryTransformKernels[transform_DVInputIterator2], 2)
                 + kps.getOutputIteratorString(std::iterator_traits<OutputIterator>::iterator_category(), 
-                                          unaryTransformKernels[transform_DVOutputIteratorU])
+                                          binaryTransformKernels[transform_DVOutputIteratorB])
                 + "const uint length,\n"
                 "global " + binaryTransformKernels[transform_BinaryFunction] + "* userFunctor);\n\n";
 
                 return templateSpecializationString;
 
-                //const std::string templateSpecializationString =
-                //    "// Host generates this instantiation string with user-specified value type and functor\n"
-                //"template __attribute__((mangled_name("+name(0)+"Instantiated)))\n"
-                //"kernel void "+name(0)+"(\n"
-                //"global " + binaryTransformKernels[transform_iType1] + "* A_ptr,\n"
-                //+ binaryTransformKernels[transform_DVInputIterator1] + " A_iter,\n"
-                //"global " + binaryTransformKernels[transform_iType2] + "* B_ptr,\n"
-                //+ binaryTransformKernels[transform_DVInputIterator2] + " B_iter,\n"
-                //"global " + binaryTransformKernels[transform_oTypeB] + "* Z_ptr,\n"
-                //+ binaryTransformKernels[transform_DVOutputIteratorB] + " Z_iter,\n"
-                //
-                //"const uint length,\n"
-                //"global " + binaryTransformKernels[transform_BinaryFunction] + "* userFunctor);\n\n"
-                //    "// Host generates this instantiation string with user-specified value type and functor\n"
-                //"template __attribute__((mangled_name("+name(1)+"Instantiated)))\n"
-                //"kernel void "+name(1)+"(\n"
-                //"global " + binaryTransformKernels[transform_iType1] + "* A_ptr,\n"
-                //+ binaryTransformKernels[transform_DVInputIterator1] + " A_iter,\n"
-                //"global " + binaryTransformKernels[transform_iType2] + "* B_ptr,\n"
-                //+ binaryTransformKernels[transform_DVInputIterator2] + " B_iter,\n"
-                //"global " + binaryTransformKernels[transform_oTypeB] + "* Z_ptr,\n"
-                //+ binaryTransformKernels[transform_DVOutputIteratorB] + " Z_iter,\n"
-                //    "const uint length,\n"
-                //"global " + binaryTransformKernels[transform_BinaryFunction] + "* userFunctor);\n\n";
-                //return templateSpecializationString;
             }
 
         const ::std::string getBinaryNoBoundsKernelPrototype (  ) 
@@ -451,18 +428,16 @@ namespace cl{
                 "template <typename iIterType1, typename iIterType2, typename oIterType, typename unary_function > \n"
                 "kernel \n"
                 "void transformNoBoundsCheckTemplate( \n"
-                
                 "    global typename iIterType1::value_type* in1_ptr_0, \n"; 
                 if( std::is_same<typename bolt::cl::iterator_traits<typename InputIterator1>::iterator_category, bolt::cl::permutation_iterator_tag>::value == true)
                     return_string += "    global typename iIterType1::index_type* in1_ptr_1, \n";
-                "    iIterType in1_iter,\n"
-
-                "    global typename iIterType2::value_type* in2_ptr_0, \n"; 
-                if( std::is_same<typename bolt::cl::iterator_traits<typename InputIterator1>::iterator_category, bolt::cl::permutation_iterator_tag>::value == true)
-                    return_string += "    global typename iIterType2::index_type* in2_ptr_1, \n";
-                "    iIterType in2_iter,\n"
-
                 return_string += 
+                "    iIterType1 in1_iter,\n"
+                "    global typename iIterType2::value_type* in2_ptr_0, \n"; 
+                if( std::is_same<typename bolt::cl::iterator_traits<typename InputIterator2>::iterator_category, bolt::cl::permutation_iterator_tag>::value == true)
+                    return_string += "    global typename iIterType2::index_type* in2_ptr_1, \n";
+                return_string += 
+                "    iIterType2 in2_iter,\n"
                 "    global typename oIterType::value_type* out_ptr_0,\n"
                 "    oIterType Z_iter,\n"
 			    "    const uint length,\n"
@@ -496,18 +471,16 @@ namespace cl{
                 "template <typename iIterType1, typename iIterType2, typename oIterType, typename unary_function > \n"
                 "kernel \n"
                 "void transformTemplate( \n"
-                
                 "    global typename iIterType1::value_type* in1_ptr_0, \n"; 
                 if( std::is_same<typename bolt::cl::iterator_traits<typename InputIterator1>::iterator_category, bolt::cl::permutation_iterator_tag>::value == true)
                     return_string += "    global typename iIterType1::index_type* in1_ptr_1, \n";
-                "    iIterType in1_iter,\n"
-
-                "    global typename iIterType2::value_type* in2_ptr_0, \n"; 
-                if( std::is_same<typename bolt::cl::iterator_traits<typename InputIterator1>::iterator_category, bolt::cl::permutation_iterator_tag>::value == true)
-                    return_string += "    global typename iIterType2::index_type* in2_ptr_1, \n";
-                "    iIterType in2_iter,\n"
-
                 return_string += 
+                "    iIterType1 in1_iter,\n"
+                "    global typename iIterType2::value_type* in2_ptr_0, \n"; 
+                if( std::is_same<typename bolt::cl::iterator_traits<typename InputIterator2>::iterator_category, bolt::cl::permutation_iterator_tag>::value == true)
+                    return_string += "    global typename iIterType2::index_type* in2_ptr_1, \n";
+                return_string += 
+                "    iIterType2 in2_iter,\n"
                 "    global typename oIterType::value_type* out_ptr_0,\n"
                 "    oIterType Z_iter,\n"
 			    "    const uint length,\n"
@@ -557,7 +530,7 @@ namespace cl{
                 "template __attribute__((mangled_name("+name( 0 )+"Instantiated)))\n"
                 "kernel void unaryTransformTemplate(\n"
                 + kps.getInputIteratorString(std::iterator_traits<InputIterator>::iterator_category(), 
-                                         unaryTransformKernels[transform_DVInputIterator] )
+                                         unaryTransformKernels[transform_DVInputIterator], 1 )
                 + kps.getOutputIteratorString(std::iterator_traits<OutputIterator>::iterator_category(), 
                                           unaryTransformKernels[transform_DVOutputIteratorU] )
                 + "const uint length,\n"
@@ -567,7 +540,7 @@ namespace cl{
                 "template __attribute__((mangled_name("+name(1)+"Instantiated)))\n"
                 "kernel void unaryTransformNoBoundsCheckTemplate(\n"
                 + kps.getInputIteratorString(std::iterator_traits<InputIterator>::iterator_category(), 
-                                         unaryTransformKernels[transform_DVInputIterator])
+                                         unaryTransformKernels[transform_DVInputIterator], 1)
                 + kps.getOutputIteratorString(std::iterator_traits<OutputIterator>::iterator_category(), 
                                           unaryTransformKernels[transform_DVOutputIteratorU])
                 + "const uint length,\n"
@@ -750,20 +723,28 @@ namespace cl{
         typename InputIterator2::Payload first2_payload = first2.gpuPayload( );
         typename OutputIterator::Payload result_payload = result.gpuPayload( );
 
-        /*Get the OpenCL buffers. We pass the OpenCL buffer to the kernel*/
-        const ::cl::Buffer &first1_buffer = first1.base().getContainer().getBuffer();
-        const ::cl::Buffer &first2_buffer = first2.base().getContainer().getBuffer();
-        const ::cl::Buffer &result_buffer = result.getContainer().getBuffer();
+        int arg_num = 0;
+        /*Set the arguments for the kernel for InputIterator. Note that this takes input as the argument 
+          number to start setting the values. The return value is the number of the argument to begin setting 
+          the next Kernel arguments. 
+          Once the cl::Buffer arguments are set the GPU Payload arguments are also passed to the kernel*/
+        arg_num = first1.setKernelBuffers(arg_num, kernels[boundsCheck]);
+        kernels[boundsCheck].setArg(arg_num, first1.gpuPayloadSize( ),&first1_payload);
+        arg_num++;
 
-        kernels[boundsCheck].setArg( 0, first1_buffer );
-        kernels[boundsCheck].setArg( 1, first1.gpuPayloadSize( ),&first1_payload);
-        kernels[boundsCheck].setArg( 2, first2_buffer );
-        kernels[boundsCheck].setArg( 3, first2.gpuPayloadSize( ),&first2_payload);
-        kernels[boundsCheck].setArg( 4, result_buffer );
-        kernels[boundsCheck].setArg( 5, result.gpuPayloadSize( ),&result_payload);
+        arg_num = first2.setKernelBuffers(arg_num, kernels[boundsCheck]);
+        kernels[boundsCheck].setArg(arg_num, first2.gpuPayloadSize( ),&first2_payload);
+        arg_num++;
+
+        /*Do the same for OutputIterator*/
+        arg_num = result.setKernelBuffers(arg_num, kernels[boundsCheck]);
+        kernels[boundsCheck].setArg(arg_num, result.gpuPayloadSize( ),&result_payload);
+        arg_num++;
+
         //The type cast to int is required because sz is of type size_t
-        kernels[boundsCheck].setArg( 6, (int)distVec );
-        kernels[boundsCheck].setArg( 7, *userFunctor);
+        kernels[boundsCheck].setArg(arg_num, (int)distVec );
+        kernels[boundsCheck].setArg(arg_num+1, *userFunctor);
+
 
         ::cl::Event transformEvent;
         l_Error = ctl.getCommandQueue().enqueueNDRangeKernel(

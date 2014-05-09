@@ -111,11 +111,13 @@ namespace cl {
             {
             }
 
-            operator pointer() {
+            value_type* getPointer()
+            {
                 return &m_initValue;
             }
 
-            operator const pointer() const {
+            const value_type* getPointer() const
+            {
                 return &m_initValue;
             }
 
@@ -232,6 +234,7 @@ namespace cl {
     static std::string deviceCountingIterator =
         std::string("#if !defined(BOLT_CL_COUNTING_ITERATOR) \n") +
         STRINGIFY_CODE(
+        #define BOLT_CL_COUNTING_ITERATOR \n
         namespace bolt { namespace cl { \n
         template< typename T > \n
         class counting_iterator \n

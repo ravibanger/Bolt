@@ -166,7 +166,6 @@ make_permutation_iterator( ElementIterator e, IndexIterator i )
         std::string("#if !defined(BOLT_CL_PERMUTATION_ITERATOR) \n") +
         STRINGIFY_CODE(
             #define BOLT_CL_PERMUTATION_ITERATOR \n
-            #define SECOND_PTR \n
             namespace bolt { namespace cl { \n
             template< typename IndexIterator, typename ElementIterator > \n
             class permutation_iterator \n

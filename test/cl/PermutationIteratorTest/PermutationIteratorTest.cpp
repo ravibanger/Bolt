@@ -279,7 +279,6 @@ TEST( PermutationIterator, UnaryTransformRoutine)
         global_id = 0;
 
         {/*Test case when input is a permutation Iterators*/
-            //bolt::cl::transform(sv_perm_begin, sv_perm_end, svOutVec.begin(), add3);
             bolt::cl::transform(dv_perm_begin, dv_perm_end, dvOutVec.begin(), add3);
             /*Compute expected results*/
             std::transform(sv_perm_begin, sv_perm_end, stlOut.begin(), add3);
@@ -287,55 +286,31 @@ TEST( PermutationIterator, UnaryTransformRoutine)
             cmpArrays(dvOutVec, stlOut, length);
             //cmpArrays(svOutVec, stlOut, length);
         }
-        //{/*Test case when the both are randomAccessIterator */
-        //    bolt::cl::transform(svIndexVec.begin(), svIndexVec.end(), svOutVec.begin(), add3);
-        //    bolt::cl::transform(dvIndexVec.begin(), dvIndexVec.end(), dvOutVec.begin(), add3);
-        //    /*Compute expected results*/
-        //    std::transform(svIndexVec.begin(), svIndexVec.end(), stlOut.begin(), add3);
-        //    /*Check the results*/
-        //    cmpArrays(svOutVec, stlOut, length);
-        //    cmpArrays(dvOutVec, stlOut, length);
-        //}
-        //{/*Test case when the first input is constant iterator and the second is a counting iterator */
-        //    bolt::cl::transform(const_itr_begin, const_itr_end, svOutVec.begin(), add3);
-        //    bolt::cl::transform(const_itr_begin, const_itr_end, dvOutVec.begin(), add3);
-        //    /*Compute expected results*/
-        //    std::vector<int> const_vector(length,1);
-        //    std::transform(const_vector.begin(), const_vector.end(), stlOut.begin(), add3);
-        //    /*Check the results*/
-        //    cmpArrays(svOutVec, stlOut, length);
-        //    cmpArrays(dvOutVec, stlOut, length);
-        //}
-        //{/*Test case when the first input is constant iterator and the second is a counting iterator */
-        //    bolt::cl::transform(count_itr_begin, count_itr_end, svOutVec.begin(), add3);
-        //    bolt::cl::transform(count_itr_begin, count_itr_end, dvOutVec.begin(), add3);
-        //    /*Compute expected results*/
-        //    std::vector<int> count_vector(length);
-        //    for (int index=0;index<length;index++)
-        //        count_vector[index] = index;
-        //    std::transform(count_vector.begin(), count_vector.end(), stlOut.begin(), add3);
-        //    /*Check the results*/
-        //    cmpArrays(svOutVec, stlOut, length);
-        //    cmpArrays(dvOutVec, stlOut, length);
-        //}
         global_id = 0; // Reset the global id counter
     }
 }
 
 
-
-TEST( TransformIterator, UnaryTransformRoutine)
+TEST( PermutationIterator, BinaryTransformRoutine)
 {
     {
         const int length = 1<<10;
-        std::vector< int > svIn1Vec( length );
+        std::vector< int > svIndexVec1( length );
+        std::vector< int > svElementVec1( length );
+        std::vector< int > svIndexVec2( length );
+        std::vector< int > svElementVec2( length );
+
         std::vector< int > svOutVec( length );
         std::vector< int > stlOut( length );
-        bolt::BCKND::device_vector< int > dvIn1Vec( length );
+        bolt::BCKND::device_vector< int > dvIndexVec1( length );
+        bolt::BCKND::device_vector< int > dvElementVec1( length );
+        bolt::BCKND::device_vector< int > dvIndexVec2( length );
+        bolt::BCKND::device_vector< int > dvElementVec2( length );
         bolt::BCKND::device_vector< int > dvOutVec( length );
 
         add_3 add3;
         gen_input gen;
+        gen_input_plus_1 gen_plus_1;
         typedef std::vector< int >::const_iterator                                                     sv_itr;
         typedef bolt::BCKND::device_vector< int >::iterator                                            dv_itr;
         typedef bolt::BCKND::counting_iterator< int >                                                  counting_itr;
@@ -344,10 +319,18 @@ TEST( TransformIterator, UnaryTransformRoutine)
         typedef bolt::BCKND::transform_iterator< add_3, bolt::BCKND::device_vector< int >::iterator>   dv_trf_itr_add3;
         typedef bolt::BCKND::transform_iterator< add_4, std::vector< int >::const_iterator>            sv_trf_itr_add4;
         typedef bolt::BCKND::transform_iterator< add_4, bolt::BCKND::device_vector< int >::iterator>   dv_trf_itr_add4;    
+        typedef bolt::BCKND::permutation_iterator< bolt::BCKND::device_vector< int >::iterator, 
+                                                   bolt::BCKND::device_vector< int >::iterator>        dv_perm_itr;
+        typedef bolt::BCKND::permutation_iterator< std::vector< int >::iterator, 
+                                                   std::vector< int >::iterator>                       sv_perm_itr;
         /*Create Iterators*/
-        sv_trf_itr_add3 sv_trf_begin1 (svIn1Vec.begin(), add3), sv_trf_end1 (svIn1Vec.end(), add3);
+        sv_trf_itr_add3 sv_trf_begin1 (svIndexVec1.begin(), add3), sv_trf_end1 (svIndexVec1.end(), add3);
+        dv_trf_itr_add3 dv_trf_begin1 (dvIndexVec1.begin(), add3), dv_trf_end1 (dvIndexVec1.end(), add3);
 
-        dv_trf_itr_add3 dv_trf_begin1 (dvIn1Vec.begin(), add3), dv_trf_end1 (dvIn1Vec.end(), add3);
+        sv_perm_itr sv_perm_begin1 (svElementVec1.begin(), svIndexVec1.begin()), sv_perm_end1 (svElementVec1.end(), svIndexVec1.end());
+        sv_perm_itr sv_perm_begin2 (svElementVec2.begin(), svIndexVec2.begin());
+        dv_perm_itr dv_perm_begin1 (dvElementVec1.begin(), dvIndexVec1.begin()), dv_perm_end1 (dvElementVec1.end(), dvIndexVec1.end());
+        dv_perm_itr dv_perm_begin2 (dvElementVec2.begin(), dvIndexVec2.begin());
 
         counting_itr count_itr_begin(0);
         counting_itr count_itr_end = count_itr_begin + length;
@@ -356,175 +339,63 @@ TEST( TransformIterator, UnaryTransformRoutine)
 
         /*Generate inputs*/
         global_id = 0;
-        std::generate(svIn1Vec.begin(), svIn1Vec.end(), gen);
+        std::generate(svIndexVec1.begin(),   svIndexVec1.end(),   gen); 
         global_id = 0;
-        bolt::BCKND::generate(dvIn1Vec.begin(), dvIn1Vec.end(), gen);
+        std::generate(svElementVec1.begin(), svElementVec1.end(), gen_plus_1); 
         global_id = 0;
-        {/*Test case when inputs are trf Iterators*/
-            bolt::cl::transform(sv_trf_begin1, sv_trf_end1, svOutVec.begin(), add3);
-            bolt::cl::transform(dv_trf_begin1, dv_trf_end1, dvOutVec.begin(), add3);
+        bolt::BCKND::generate(dvIndexVec1.begin(), dvIndexVec1.end(), gen);
+        global_id = 0;
+        bolt::BCKND::generate(dvElementVec1.begin(), dvElementVec1.end(), gen_plus_1);
+        global_id = 0;
+
+        std::generate(svIndexVec2.begin(),   svIndexVec2.end(),   gen); 
+        global_id = 0;
+        std::generate(svElementVec2.begin(), svElementVec2.end(), gen_plus_1); 
+        global_id = 0;
+        bolt::BCKND::generate(dvIndexVec2.begin(), dvIndexVec2.end(), gen);
+        global_id = 0;
+        bolt::BCKND::generate(dvElementVec2.begin(), dvElementVec2.end(), gen_plus_1);
+        global_id = 0;
+
+        {/*Test case when input is a permutation Iterators*/
+            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, dv_perm_begin2, dvOutVec.begin(), add3);
             /*Compute expected results*/
-            std::transform(sv_trf_begin1, sv_trf_end1, stlOut.begin(), add3);
+            std::transform(sv_perm_begin1, sv_perm_end1, sv_perm_begin2, stlOut.begin(), add3);
             /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
             cmpArrays(dvOutVec, stlOut, length);
         }
-        {/*Test case when the both are randomAccessIterator */
-            bolt::cl::transform(svIn1Vec.begin(), svIn1Vec.end(), svOutVec.begin(), add3);
-            bolt::cl::transform(dvIn1Vec.begin(), dvIn1Vec.end(), dvOutVec.begin(), add3);
+        {/*Test case when input is a permutation Iterators*/
+            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, const_itr_begin, dvOutVec.begin(), add3);
             /*Compute expected results*/
-            std::transform(svIn1Vec.begin(), svIn1Vec.end(), stlOut.begin(), add3);
+            std::transform(sv_perm_begin1, sv_perm_end1, const_itr_begin, stlOut.begin(), add3);
             /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
             cmpArrays(dvOutVec, stlOut, length);
         }
-        {/*Test case when the first input is constant iterator and the second is a counting iterator */
-            bolt::cl::transform(const_itr_begin, const_itr_end, svOutVec.begin(), add3);
-            bolt::cl::transform(const_itr_begin, const_itr_end, dvOutVec.begin(), add3);
+        {/*Test case when input is a permutation Iterators*/
+            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, count_itr_begin, dvOutVec.begin(), add3);
             /*Compute expected results*/
-            std::vector<int> const_vector(length,1);
-            std::transform(const_vector.begin(), const_vector.end(), stlOut.begin(), add3);
+            std::transform(sv_perm_begin1, sv_perm_end1, count_itr_begin, stlOut.begin(), add3);
             /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
             cmpArrays(dvOutVec, stlOut, length);
         }
-        {/*Test case when the first input is constant iterator and the second is a counting iterator */
-            bolt::cl::transform(count_itr_begin, count_itr_end, svOutVec.begin(), add3);
-            bolt::cl::transform(count_itr_begin, count_itr_end, dvOutVec.begin(), add3);
+        {/*Test case when input is a permutation Iterators*/
+            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, dvElementVec2.begin(), dvOutVec.begin(), add3);
             /*Compute expected results*/
-            std::vector<int> count_vector(length);
-            for (int index=0;index<length;index++)
-                count_vector[index] = index;
-            std::transform(count_vector.begin(), count_vector.end(), stlOut.begin(), add3);
+            std::transform(sv_perm_begin1, sv_perm_end1, svElementVec2.begin(), stlOut.begin(), add3);
             /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
+            cmpArrays(dvOutVec, stlOut, length);
+        }
+
+        {/*Test case when input is a permutation Iterators*/
+            bolt::cl::transform(dv_perm_begin1, dv_perm_end1, dvElementVec2.begin(), dvOutVec.begin(), add3);
+            /*Compute expected results*/
+            std::transform(sv_perm_begin1, sv_perm_end1, svElementVec2.begin(), stlOut.begin(), add3);
+            /*Check the results*/
             cmpArrays(dvOutVec, stlOut, length);
         }
         global_id = 0; // Reset the global id counter
     }
 }
-
-#if 0
-
-TEST( TransformIterator, BinaryTransformRoutine)
-{
-    {
-        const int length = 1<<10;
-        std::vector< int > svIn1Vec( length );
-        std::vector< int > svIn2Vec( length );
-        std::vector< int > svOutVec( length );
-        std::vector< int > stlOut( length );
-        bolt::BCKND::device_vector< int > dvIn1Vec( length );
-        bolt::BCKND::device_vector< int > dvIn2Vec( length );
-        bolt::BCKND::device_vector< int > dvOutVec( length );
-
-        add_3 add3;
-        add_4 add4;
-        bolt::cl::plus<int> plus;
-        gen_input gen;
-        typedef std::vector< int >::const_iterator                                                         sv_itr;
-        typedef bolt::BCKND::device_vector< int >::iterator                                                dv_itr;
-        typedef bolt::BCKND::counting_iterator< int >                                                      counting_itr;
-        typedef bolt::BCKND::constant_iterator< int >                                                      constant_itr;
-        typedef bolt::BCKND::transform_iterator< add_3, std::vector< int >::const_iterator>                sv_trf_itr_add3;
-        typedef bolt::BCKND::transform_iterator< add_3, bolt::BCKND::device_vector< int >::iterator>       dv_trf_itr_add3;
-        typedef bolt::BCKND::transform_iterator< add_4, std::vector< int >::const_iterator>                sv_trf_itr_add4;
-        typedef bolt::BCKND::transform_iterator< add_4, bolt::BCKND::device_vector< int >::iterator>       dv_trf_itr_add4;    
-        /*Create Iterators*/
-        sv_trf_itr_add3 sv_trf_begin1 (svIn1Vec.begin(), add3), sv_trf_end1 (svIn1Vec.end(), add3);
-        sv_trf_itr_add4 sv_trf_begin2 (svIn2Vec.begin(), add4);
-        dv_trf_itr_add3 dv_trf_begin1 (dvIn1Vec.begin(), add3), dv_trf_end1 (dvIn1Vec.end(), add3);
-        dv_trf_itr_add4 dv_trf_begin2 (dvIn2Vec.begin(), add4);
-        counting_itr count_itr_begin(0);
-        counting_itr count_itr_end = count_itr_begin + length;
-        constant_itr const_itr_begin(1);
-        constant_itr const_itr_end = const_itr_begin + length;
-
-        /*Generate inputs*/
-        global_id = 0;
-        std::generate(svIn1Vec.begin(), svIn1Vec.end(), gen);
-        global_id = 0;
-        std::generate(svIn2Vec.begin(), svIn2Vec.end(), gen);
-        global_id = 0;
-        bolt::BCKND::generate(dvIn1Vec.begin(), dvIn1Vec.end(), gen);
-        global_id = 0;
-        bolt::BCKND::generate(dvIn2Vec.begin(), dvIn2Vec.end(), gen);
-        global_id = 0;
-        {/*Test case when both inputs are trf Iterators*/
-            bolt::cl::transform(sv_trf_begin1, sv_trf_end1, sv_trf_begin2, svOutVec.begin(), plus);
-            bolt::cl::transform(dv_trf_begin1, dv_trf_end1, dv_trf_begin2, dvOutVec.begin(), plus);
-            /*Compute expected results*/
-            std::transform(sv_trf_begin1, sv_trf_end1, sv_trf_begin2, stlOut.begin(), plus);
-            /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
-            cmpArrays(dvOutVec, stlOut, length);
-        }
-        {/*Test case when the first input is trf_itr and the second is a randomAccessIterator */
-            bolt::cl::transform(sv_trf_begin1, sv_trf_end1, svIn2Vec.begin(), svOutVec.begin(), plus);
-            bolt::cl::transform(dv_trf_begin1, dv_trf_end1, dvIn2Vec.begin(), dvOutVec.begin(), plus);
-            /*Compute expected results*/
-            std::transform(sv_trf_begin1, sv_trf_end1, svIn2Vec.begin(), stlOut.begin(), plus);
-            /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
-            cmpArrays(dvOutVec, stlOut, length);
-        }
-        {/*Test case when the second input is trf_itr and the first is a randomAccessIterator */
-            bolt::cl::transform(svIn1Vec.begin(), svIn1Vec.end(), sv_trf_begin2, svOutVec.begin(), plus);
-            bolt::cl::transform(dvIn1Vec.begin(), dvIn1Vec.end(), dv_trf_begin2, dvOutVec.begin(), plus);
-            /*Compute expected results*/
-            std::transform(svIn1Vec.begin(), svIn1Vec.end(), sv_trf_begin2, stlOut.begin(), plus);
-            /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
-            cmpArrays(dvOutVec, stlOut, length);
-        }
-        {/*Test case when the both are randomAccessIterator */
-            bolt::cl::transform(svIn1Vec.begin(), svIn1Vec.end(), svIn2Vec.begin(), svOutVec.begin(), plus);
-            bolt::cl::transform(dvIn1Vec.begin(), dvIn1Vec.end(), dvIn2Vec.begin(), dvOutVec.begin(), plus);
-            /*Compute expected results*/
-            std::transform(svIn1Vec.begin(), svIn1Vec.end(), svIn2Vec.begin(), stlOut.begin(), plus);
-            /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
-            cmpArrays(dvOutVec, stlOut, length);
-        }
-        {/*Test case when the first input is trf_itr and the second is a constant iterator */
-            bolt::cl::transform(sv_trf_begin1, sv_trf_end1, const_itr_begin, svOutVec.begin(), plus);
-            bolt::cl::transform(dv_trf_begin1, dv_trf_end1, const_itr_begin, dvOutVec.begin(), plus);
-            /*Compute expected results*/
-            std::vector<int> const_vector(length,1);
-            std::transform(sv_trf_begin1, sv_trf_end1, const_vector.begin(), stlOut.begin(), plus);
-            /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
-            cmpArrays(dvOutVec, stlOut, length);
-        }
-        {/*Test case when the first input is trf_itr and the second is a counting iterator */
-            bolt::cl::transform(sv_trf_begin1, sv_trf_end1, count_itr_begin, svOutVec.begin(), plus);
-            bolt::cl::transform(dv_trf_begin1, dv_trf_end1, count_itr_begin, dvOutVec.begin(), plus);
-            /*Compute expected results*/
-            std::vector<int> count_vector(length);
-            for (int index=0;index<length;index++)
-                count_vector[index] = index;
-            std::transform(sv_trf_begin1, sv_trf_end1, count_vector.begin(), stlOut.begin(), plus);
-            /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
-            cmpArrays(dvOutVec, stlOut, length);
-        }
-        {/*Test case when the first input is constant iterator and the second is a counting iterator */
-            bolt::cl::transform(const_itr_begin, const_itr_end, count_itr_begin, svOutVec.begin(), plus);
-            bolt::cl::transform(const_itr_begin, const_itr_end, count_itr_begin, dvOutVec.begin(), plus);
-            /*Compute expected results*/
-           std::vector<int> const_vector(length,1);
-            std::vector<int> count_vector(length);
-            for (int index=0;index<length;index++)
-                count_vector[index] = index;            
-            std::transform(const_vector.begin(), const_vector.end(), count_vector.begin(), stlOut.begin(), plus);
-            /*Check the results*/
-            cmpArrays(svOutVec, stlOut, length);
-            cmpArrays(dvOutVec, stlOut, length);
-        }
-        global_id = 0; // Reset the global id counter
-    }
-}
-#endif
 
 /* /brief List of possible tests
  * Two input transform with first input a constant iterator
